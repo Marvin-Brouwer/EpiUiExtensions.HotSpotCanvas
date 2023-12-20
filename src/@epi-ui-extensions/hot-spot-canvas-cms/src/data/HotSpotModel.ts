@@ -1,4 +1,4 @@
-import { HotSpotEditorSettings } from "../editor/EditorSettings"
+import { HotSpotEditorSettings } from "./EditorSettings"
 import { createEmptyHotSpotArray } from "../util/arrays"
 
 export type HotSpotModel = {
