@@ -1,0 +1,21 @@
+
+.hot-spot-canvas .insert-controls {
+	margin-top: 10px;
+	display: flex;
+	flex-direction: column;
+}
+
+.hot-spot-canvas .insert-controls .page-button,
+.hot-spot-canvas .insert-controls .catalog-button {
+	width: 70%;
+	display: inline-flex;
+	justify-content: stretch;
+	height: 30px;
+	flex-direction: column;
+}
+
+.hot-spot-canvas .insert-controls .page-button .dijitButtonNode,
+.hot-spot-canvas .insert-controls .catalog-button .dijitButtonNode {
+	width: 100%;
+	text-align: left;
+}

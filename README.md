@@ -1,2 +1,3 @@
-# EpiUiExtensions.ImageHotspots
-An EpiServer editor component to manage hotspots on an image
+# EpiUiExtensions.ImageHotSpots
+
+An EpiServer editor component to manage HotSpots on an image

@@ -1,0 +1,7 @@
+.hot-spot-canvas .hot-spot-list {
+
+	display: flex;
+	flex-direction: column;
+	width: 492px;
+	margin-right: 10px;
+}

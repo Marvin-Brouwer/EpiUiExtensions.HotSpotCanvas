@@ -1,0 +1,10 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+dependencies:
+  '@epi-ui-extensions/hot-spot-canvas-cms':
+    specifier: link:..\@epi-ui-extensions\hot-spot-canvas-cms
+    version: link:../@epi-ui-extensions/hot-spot-canvas-cms
