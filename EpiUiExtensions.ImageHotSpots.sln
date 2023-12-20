@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EpiUiExtensions.ImageHotSpots.CmsComponent", "src\EpiUiExtensions.ImageHotspots.CmsComponent\EpiUiExtensions.ImageHotSpots.CmsComponent.csproj", "{172AE351-0686-4746-932C-361D5195E045}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{2B419400-15E4-4A24-9835-2201C3DC15F9}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		NuGet.config = NuGet.config
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{172AE351-0686-4746-932C-361D5195E045}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{172AE351-0686-4746-932C-361D5195E045}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{172AE351-0686-4746-932C-361D5195E045}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{172AE351-0686-4746-932C-361D5195E045}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0B1F88CA-CED9-4E31-86BF-0A3E0B2EFD7B}
+	EndGlobalSection
+EndGlobal
