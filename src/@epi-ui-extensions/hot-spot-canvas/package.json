@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Marvin-Brouwer/EpiUiExtensions.ImageHotspots.git"
+    "url": "git+https://github.com/Marvin-Brouwer/EpiUiExtensions.HotSpotCanvas.git"
   },
   "keywords": [
     "episerver"
@@ -16,9 +16,9 @@
   "author": "Marvin Brouwer",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/Marvin-Brouwer/EpiUiExtensions.ImageHotspots/issues"
+    "url": "https://github.com/Marvin-Brouwer/EpiUiExtensions.HotSpotCanvas/issues"
   },
-  "homepage": "https://github.com/Marvin-Brouwer/EpiUiExtensions.ImageHotspots#readme",
+  "homepage": "https://github.com/Marvin-Brouwer/EpiUiExtensions.HotSpotCanvas#readme",
   "volta": {
     "node": "20.10.0"
   },

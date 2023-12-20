@@ -1,5 +1,5 @@
 {
-  "name": "EpiUiExtensions-ImageHotspots-CmsComponent",
+  "name": "EpiUiExtensions-HotSpotCanvas-CmsComponent",
   "description": "just here for pnpm link",
   "dependencies": {
     "@epi-ui-extensions/hot-spot-canvas-cms": "link:..\\@epi-ui-extensions\\hot-spot-canvas-cms"
