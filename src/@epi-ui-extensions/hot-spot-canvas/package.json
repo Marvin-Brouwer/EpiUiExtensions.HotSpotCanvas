@@ -4,7 +4,7 @@
   "description": "An EpiServer editor component to manage HotSpots on an image",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "pnpm exec mitosis build"
   },
   "repository": {
     "type": "git",
@@ -25,5 +25,8 @@
   "dependencies": {
     "@builder.io/mitosis": "^0.0.137",
     "@builder.io/mitosis-cli": "^0.0.96"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.45"
   }
 }
