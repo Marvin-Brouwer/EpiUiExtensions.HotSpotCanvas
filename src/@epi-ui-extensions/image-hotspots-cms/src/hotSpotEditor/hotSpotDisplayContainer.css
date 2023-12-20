@@ -1,0 +1,27 @@
+
+.hotspot-hero .hotspot-display {
+	position: absolute;
+	overflow: hidden;
+	top: 0;
+}
+.hotspot-hero .hotspot-display[data-readOnly="true"] {
+	opacity: .8;
+}
+.hotspot-hero .hotspot-display .drop-content-selector,
+.hotspot-hero .hotspot-display .drop-content-selector .dijitInlineTable {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: transparent !important;
+	box-sizing: border-box;
+}
+
+.hotspot-hero .hotspot-display .drop-content-selector .dijitInputField  {
+	display: none;
+}
+.hotspot-hero .hotspot-display .drop-content-selector > .dijitTextBox .epi-clearButton {
+	display: none;
+}
+.hotspot-hero .hotspot-display .drop-content-selector > .dijitButton {
+	display: none;
+}

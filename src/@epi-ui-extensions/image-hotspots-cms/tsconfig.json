@@ -1,0 +1,22 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"files": [
+		"./src/index.ts"
+	],
+	"compilerOptions": {
+		"removeComments": false,
+		"target": "es2020",
+		"moduleResolution": "Node",
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"noImplicitThis": true,
+		"lib": [
+		  "DOM",
+		  "es2015",
+		  "scripthost"
+		],
+		"module": "ES2020",
+		"outDir": "./dist"
+	}
+}

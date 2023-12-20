@@ -1,0 +1,56 @@
+.hotspot-hero[data-readOnly="true"],
+.hotspot-hero[data-readOnly="true"] * {
+	user-select: none !important;
+	-moz-user-select: none !important;
+	-khtml-user-select: none !important;
+	-webkit-user-select: none !important;
+	-o-user-select: none !important;
+}
+
+.hotspot-hero  {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+.hotspot-hero .backdrop {
+	background-size: cover;
+	background-position: center center;
+	border: 1px solid #efefef;
+	/* This is important for the image sharpness */
+	box-sizing: border-box;
+	margin: auto;
+}
+.hotspot-hero .backdrop[data-readOnly="true"] {
+	opacity: .5;
+}
+
+.hotspot-hero .backdrop[style=""],
+.hotspot-hero .backdrop:not([style]) {
+	border: none;
+}
+.hotspot-hero .backdrop-wrapper {
+	min-width: 700px;
+	display: flex;
+	align-content: center;
+	align-items: center;
+	flex-direction: column;
+	border-width: 1px !important;
+}
+.hotspot-hero .backdrop-wrapper[data-loading="true"] {
+	background: center center no-repeat url("/EPiServer/Shell/11.36.9/ClientResources/dojox/widget/Standby/images/loading.gif");
+}
+.hotspot-hero .controls {
+	display: flex;
+	flex-direction: row;
+	margin-top: 10px;
+	flex-wrap: nowrap;
+    align-content: flex-start;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+.hotspot-hero .side-controls {
+	align-self: flex-start;
+	display: flex;
+	flex-direction: column;
+}

@@ -1,0 +1,21 @@
+
+.hotspot-hero .insert-controls {
+	margin-top: 10px;
+	display: flex;
+	flex-direction: column;
+}
+
+.hotspot-hero .insert-controls .page-button,
+.hotspot-hero .insert-controls .catalog-button {
+	width: 70%;
+	display: inline-flex;
+	justify-content: stretch;
+	height: 30px;
+	flex-direction: column;
+}
+
+.hotspot-hero .insert-controls .page-button .dijitButtonNode,
+.hotspot-hero .insert-controls .catalog-button .dijitButtonNode {
+	width: 100%;
+	text-align: left;
+}

@@ -1,0 +1,36 @@
+{
+  "name": "@epi-ui-extensions/image-hotspots-cms",
+  "version": "1.0.0",
+  "description": "The cms component to accompany @epi-ui-extensions/image-hotspots",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "pnpm build --mode development --watch",
+    "build": "vite build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Marvin-Brouwer/EpiUiExtensions.ImageHotspots.git"
+  },
+  "keywords": [
+    "episerver"
+  ],
+  "author": "Marvin Brouwer",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Marvin-Brouwer/EpiUiExtensions.ImageHotspots/issues"
+  },
+  "homepage": "https://github.com/Marvin-Brouwer/EpiUiExtensions.ImageHotspots#readme",
+  "volta": {
+    "node": "20.10.0"
+  },
+  "devDependencies": {
+    "@types/dojo": "^1.9.48",
+    "@types/node": "^18.15.7",
+    "rollup-plugin-amd": "^4.0.0",
+    "typescript": "^5.0.2",
+    "vite": "^4.2.1"
+  },
+  "dependencies": {
+    "epi-ui-extensions": "link:D:Labs/EpiUiExtensions/src/epi-ui-extensions/dist"
+  }
+}
