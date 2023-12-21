@@ -4,7 +4,8 @@
   "description": "An EpiServer editor component to manage HotSpots on an image",
   "main": "src/index.js",
   "scripts": {
-    "build": "pnpm exec mitosis build"
+    "build": "pnpm exec mitosis build",
+    "build2": "vite build"
   },
   "repository": {
     "type": "git",
@@ -23,10 +24,13 @@
     "node": "20.10.0"
   },
   "dependencies": {
-    "@builder.io/mitosis": "^0.0.137",
-    "@builder.io/mitosis-cli": "^0.0.96"
+    "@builder.io/mitosis": "^0.0.137"
   },
   "devDependencies": {
-    "@types/react": "^18.2.45"
+    "@babel/plugin-syntax-import-meta": "^7.10.4",
+    "@types/react": "^18.2.45",
+    "vite": "^5.0.10",
+    "vite-plugin-typescript": "^1.0.4",
+    "@builder.io/mitosis-cli": "^0.0.96"
   }
 }

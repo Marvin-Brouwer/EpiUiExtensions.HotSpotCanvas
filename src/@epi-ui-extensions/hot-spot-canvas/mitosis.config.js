@@ -7,6 +7,9 @@ module.exports = {
     options: {
         vue2: { 
             api: 'composition'
-        }
+        },
+    },
+    commonOptions: {
+        typescript: true,
     }
 };
