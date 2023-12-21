@@ -5,6 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@epi-ui-extensions/hot-spot-canvas-cms':
+  '@epi-ui-hot-spot-canvas/cms':
     specifier: link:..\@epi-ui-extensions\hot-spot-canvas-cms
-    version: link:../@epi-ui-extensions/hot-spot-canvas-cms
+    version: link:../@epi-ui-hot-spot-canvas/cms

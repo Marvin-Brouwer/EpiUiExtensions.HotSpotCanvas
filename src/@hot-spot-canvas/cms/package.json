@@ -1,7 +1,7 @@
 {
-  "name": "@epi-ui-extensions/hot-spot-canvas-cms",
+  "name": "@epi-ui-hot-spot-canvas/cms",
   "version": "1.0.0",
-  "description": "The cms component to accompany @epi-ui-extensions/hot-spot-canvas",
+  "description": "The cms component to accompany @epi-ui-hot-spot-canvas/client-xxx",
   "main": "src/index.js",
   "scripts": {
     "dev": "pnpm build --mode development --watch",

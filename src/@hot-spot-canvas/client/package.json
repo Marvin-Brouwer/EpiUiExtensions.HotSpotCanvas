@@ -1,8 +1,8 @@
 {
-  "name": "@epi-ui-extensions/hot-spot-canvas",
+  "name": "@epi-ui-hot-spot-canvas/client",
+  "private": true,
   "version": "1.0.0",
   "description": "An EpiServer editor component to manage HotSpots on an image",
-  "main": "src/index.js",
   "scripts": {
     "build": "pnpm exec mitosis build",
     "build2": "vite build"
