@@ -17,16 +17,6 @@ export const mitosisPlugin = (isDev: boolean, config: Partial<Omit<MitosisConfig
 		enforce: 'post',
 		apply: 'build',
 
-		config(userConfig) {
-			// return {
-			// 	// only apply esbuild to ts files
-			// 	// since we are handling tsx now
-			// 	esbuild: {
-			// 		include: /\.ts$/,
-			// 	}
-			// }
-		},
-
         configResolved(resolvedConfig) {
             _config = resolvedConfig
         },
@@ -60,7 +50,6 @@ export const mitosisPlugin = (isDev: boolean, config: Partial<Omit<MitosisConfig
 			// 	{ isTSX: true, allowExtensions: true, allowDeclareFields: true },
 			// ])
 
-
 			const originalFile = await readFile(id, { encoding: 'utf8' });
 			const jsonTree = parseJsx(originalFile, { typescript: true });
 
@@ -88,7 +77,7 @@ export const mitosisPlugin = (isDev: boolean, config: Partial<Omit<MitosisConfig
 			}
 
 
-			return { code, moduleSideEffects: false };
+			return { code: 'undefined', moduleSideEffects: true };
         }
     });
 };

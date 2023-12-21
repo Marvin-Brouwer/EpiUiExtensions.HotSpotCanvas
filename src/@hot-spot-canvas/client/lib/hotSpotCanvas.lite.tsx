@@ -1,13 +1,27 @@
 import { For, Show } from '@builder.io/mitosis';
-import { HotSpotCanvasViewModel } from './data/hotSpotCanvasViewModel'
-import { HotSpotViewModel } from './data/hotSpotViewModel';
 
-export type HotSpotCanvasProps = {
+export type HotSpotViewModel<T = any> = {
+
+	contentUrl: string,
+	coordinates: { x: number, y: number },
+	content: T
+}
+
+export type HotSpotCanvasViewModel<T = any> = {
+
+	canvasWidth: number,
+	canvasHeight: number,
+
+	imageUrl: string,
+	hotSpots: Array<HotSpotViewModel<T>>
+}
+
+export type HotSpotCanvasProps<T = any> = {
   siteHost: string,
-  hero: HotSpotCanvasViewModel,
-  pageWrapper: (hotSpot: HotSpotViewModel) => Element,
-  productWrapper: (hotSpot: HotSpotViewModel) => Element,
-  variantWrapper: (hotSpot: HotSpotViewModel) => Element,
+  hero: HotSpotCanvasViewModel<T>,
+  pageWrapper: (hotSpot: HotSpotViewModel<T>) => Element,
+  productWrapper: (hotSpot: HotSpotViewModel<T>) => Element,
+  variantWrapper: (hotSpot: HotSpotViewModel<T>) => Element,
 };
 
 export default function HotSpotCanvas(props: HotSpotCanvasProps) {

@@ -37,8 +37,6 @@
 </template>
 
 <script lang="ts">
-import { HotSpotCanvasViewModel } from "./data/hotSpotCanvasViewModel";
-import { HotSpotViewModel } from "./data/hotSpotViewModel";
 export function getContentUrl(siteHost: string, hotSpot: HotSpotViewModel) {
   return pathJoin([siteHost, hotSpot.contentUrl]);
 }
@@ -53,12 +51,26 @@ export function urlJoin(origin: string, parts: Array<string>) {
   return url;
 }
 
-export type HotSpotCanvasProps = {
+export type HotSpotViewModel<T = any> = {
+  contentUrl: string;
+  coordinates: {
+    x: number;
+    y: number;
+  };
+  content: T;
+};
+export type HotSpotCanvasViewModel<T = any> = {
+  canvasWidth: number;
+  canvasHeight: number;
+  imageUrl: string;
+  hotSpots: Array<HotSpotViewModel<T>>;
+};
+export type HotSpotCanvasProps<T = any> = {
   siteHost: string;
-  hero: HotSpotCanvasViewModel;
-  pageWrapper: (hotSpot: HotSpotViewModel) => Element;
-  productWrapper: (hotSpot: HotSpotViewModel) => Element;
-  variantWrapper: (hotSpot: HotSpotViewModel) => Element;
+  hero: HotSpotCanvasViewModel<T>;
+  pageWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
+  productWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
+  variantWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
 };
 
 export default {

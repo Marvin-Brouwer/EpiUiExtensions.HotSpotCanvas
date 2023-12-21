@@ -1,2 +1,5 @@
 dist/
 node_modules/
+output/client.mjs
+output/client.umd.js
+output/*.tree.json
