@@ -1,4 +1,4 @@
-import { For, Show } from '@builder.io/mitosis';
+import { For, Show, Slot } from '@builder.io/mitosis';
 
 export type HotSpotViewModel<T = any> = {
 
@@ -18,39 +18,47 @@ export type HotSpotCanvasViewModel<T = any> = {
 
 export type HotSpotCanvasProps<T = any> = {
   siteHost: string,
-  hero: HotSpotCanvasViewModel<T>,
-  pageWrapper: (hotSpot: HotSpotViewModel<T>) => Element,
-  productWrapper: (hotSpot: HotSpotViewModel<T>) => Element,
-  variantWrapper: (hotSpot: HotSpotViewModel<T>) => Element,
+  model: HotSpotCanvasViewModel<T>,
 };
 
 export default function HotSpotCanvas(props: HotSpotCanvasProps) {
 
   function createImageUrl(props: HotSpotCanvasProps) {
     
-    const imageUrl = new URL(props.hero.imageUrl, props.siteHost)
-    imageUrl.searchParams.append('w', props.hero.canvasWidth.toString());
-    imageUrl.searchParams.append('h', props.hero.canvasHeight.toString());
+    const imageUrl = new URL(props.model.imageUrl, props.siteHost)
+    imageUrl.searchParams.append('w', props.model.canvasWidth.toString());
+    imageUrl.searchParams.append('h', props.model.canvasHeight.toString());
     imageUrl.searchParams.append('mode', 'crop');
   
     return imageUrl.toString();
   }
 
+  console.log('hotSpot', props.model.hotSpots)
   return (
-    <div class="hot-spot-canvas" style={{ width: `${props.hero.canvasWidth}px`, height: `${props.hero.canvasHeight}px` }}>
-		<img src={createImageUrl(props)} width={props.hero.canvasWidth} height={props.hero.canvasHeight} />
+    <div class="hot-spot-canvas" style={{ width: `${props.model.canvasWidth}px`, height: `${props.model.canvasHeight}px` }}>
+		<img src={createImageUrl(props)} width={props.model.canvasWidth} height={props.model.canvasHeight} />
 
 		<ul>
-      <For each={props.hero.hotSpots}>
+      <For each={props.model.hotSpots} >
       {
         (hotSpot) => (
-          <>
-            <li style={{ left: `${hotSpot.coordinates.x}px`, top: `${hotSpot.coordinates.y}px`}} class="hot-spot-canvas-hot-spot">
-              <Show when={hotSpot.content.contentType.includes('Page')}>{props.pageWrapper(hotSpot)}</Show>
-              <Show when={hotSpot.content.contentType.includes('Product')}>{props.productWrapper(hotSpot)}</Show>
-              <Show when={hotSpot.content.contentType.includes('Variation')}>{props.variantWrapper(hotSpot)}</Show>
-            </li>
-          </>
+          <li style={{ left: `${hotSpot.coordinates.x}px`, top: `${hotSpot.coordinates.y}px`}} class="hot-spot-canvas-hot-spot">
+            <Show when={hotSpot.content.contentType.includes('Page')}>
+              <>
+                <Slot name="page" hotSpot={hotSpot} />
+              </>
+            </Show>
+            <Show when={hotSpot.content.contentType.includes('Product')}>
+              <>
+                <Slot name="product" hotSpot={hotSpot}/>
+              </>
+            </Show>
+            <Show when={hotSpot.content.contentType.includes('Variation')}>
+              <>
+                <Slot name="variant" hotSpot={hotSpot}/>
+              </>
+            </Show>
+          </li>
         )
       }
       </For>

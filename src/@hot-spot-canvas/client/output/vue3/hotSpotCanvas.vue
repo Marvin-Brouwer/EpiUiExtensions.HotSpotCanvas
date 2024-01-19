@@ -2,18 +2,18 @@
   <div
     class="hot-spot-canvas"
     :style="{
-      width: `${hero.canvasWidth}px`,
-      height: `${hero.canvasHeight}px`,
+      width: `${model.canvasWidth}px`,
+      height: `${model.canvasHeight}px`,
     }"
   >
     <img
       :src="createImageUrl(props)"
-      :width="hero.canvasWidth"
-      :height="hero.canvasHeight"
+      :width="model.canvasWidth"
+      :height="model.canvasHeight"
     />
 
     <ul>
-      <template :key="index" v-for="(hotSpot, index) in hero.hotSpots">
+      <template :key="index" v-for="(hotSpot, index) in model.hotSpots">
         <li
           class="hot-spot-canvas-hot-spot"
           :style="{
@@ -22,15 +22,15 @@
           }"
         >
           <template v-if="hotSpot.content.contentType.includes('Page')">
-            {{ pageWrapper(hotSpot) }}
+            <slot name="page"></slot>
           </template>
 
           <template v-if="hotSpot.content.contentType.includes('Product')">
-            {{ productWrapper(hotSpot) }}
+            <slot name="product"></slot>
           </template>
 
           <template v-if="hotSpot.content.contentType.includes('Variation')">
-            {{ variantWrapper(hotSpot) }}
+            <slot name="variant"></slot>
           </template>
         </li>
       </template>
@@ -38,7 +38,9 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from "vue";
+
 export function getContentUrl(siteHost: string, hotSpot: HotSpotViewModel) {
   return pathJoin([siteHost, hotSpot.contentUrl]);
 }
@@ -69,19 +71,22 @@ export type HotSpotCanvasViewModel<T = any> = {
 };
 export type HotSpotCanvasProps<T = any> = {
   siteHost: string;
-  hero: HotSpotCanvasViewModel<T>;
-  pageWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
-  productWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
-  variantWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
+  model: HotSpotCanvasViewModel<T>;
 };
 
-const props = defineProps<HotSpotCanvasProps>();
+export default defineComponent({
+  name: "hot-spot-canvas",
 
-function createImageUrl(props: HotSpotCanvasProps) {
-  const imageUrl = new URL(props.hero.imageUrl, props.siteHost);
-  imageUrl.searchParams.append("w", props.hero.canvasWidth.toString());
-  imageUrl.searchParams.append("h", props.hero.canvasHeight.toString());
-  imageUrl.searchParams.append("mode", "crop");
-  return imageUrl.toString();
-}
+  props: ["model", "siteHost"],
+
+  methods: {
+    createImageUrl: function createImageUrl(props: HotSpotCanvasProps) {
+      const imageUrl = new URL(this.model.imageUrl, this.siteHost);
+      imageUrl.searchParams.append("w", this.model.canvasWidth.toString());
+      imageUrl.searchParams.append("h", this.model.canvasHeight.toString());
+      imageUrl.searchParams.append("mode", "crop");
+      return imageUrl.toString();
+    },
+  },
+});
 </script>

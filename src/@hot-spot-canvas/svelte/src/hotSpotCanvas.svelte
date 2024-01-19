@@ -17,10 +17,7 @@
 
   export type HotSpotCanvasProps<T = any> = {
     siteHost: string;
-    hero: HotSpotCanvasViewModel<T>;
-    pageWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
-    productWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
-    variantWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
+    model: HotSpotCanvasViewModel<T>;
   };
 </script>
 
@@ -39,11 +36,8 @@
     return url;
   }
 
-  export let hero: HotSpotCanvasProps["hero"];
+  export let model: HotSpotCanvasProps["model"];
   export let siteHost: HotSpotCanvasProps["siteHost"];
-  export let pageWrapper: HotSpotCanvasProps["pageWrapper"];
-  export let productWrapper: HotSpotCanvasProps["productWrapper"];
-  export let variantWrapper: HotSpotCanvasProps["variantWrapper"];
 
   function mitosis_styling(node, vars) {
     Object.entries(vars || {}).forEach(([p, v]) => {
@@ -56,9 +50,9 @@
   }
 
   function createImageUrl(props: HotSpotCanvasProps) {
-    const imageUrl = new URL(hero.imageUrl, siteHost);
-    imageUrl.searchParams.append("w", hero.canvasWidth.toString());
-    imageUrl.searchParams.append("h", hero.canvasHeight.toString());
+    const imageUrl = new URL(model.imageUrl, siteHost);
+    imageUrl.searchParams.append("w", model.canvasWidth.toString());
+    imageUrl.searchParams.append("h", model.canvasHeight.toString());
     imageUrl.searchParams.append("mode", "crop");
     return imageUrl.toString();
   }
@@ -66,19 +60,19 @@
 
 <div
   use:mitosis_styling={{
-    width: `${hero.canvasWidth}px`,
-    height: `${hero.canvasHeight}px`,
+    width: `${model.canvasWidth}px`,
+    height: `${model.canvasHeight}px`,
   }}
   class="hot-spot-canvas"
 >
   <img
     src={createImageUrl(props)}
-    width={hero.canvasWidth}
-    height={hero.canvasHeight}
+    width={model.canvasWidth}
+    height={model.canvasHeight}
   />
 
   <ul>
-    {#each hero.hotSpots as hotSpot}
+    {#each model.hotSpots as hotSpot}
       <li
         use:mitosis_styling={{
           left: `${hotSpot.coordinates.x}px`,
@@ -87,15 +81,15 @@
         class="hot-spot-canvas-hot-spot"
       >
         {#if hotSpot.content.contentType.includes("Page")}
-          {pageWrapper(hotSpot)}
+          <slot name="page" />
         {/if}
 
         {#if hotSpot.content.contentType.includes("Product")}
-          {productWrapper(hotSpot)}
+          <slot name="product" />
         {/if}
 
         {#if hotSpot.content.contentType.includes("Variation")}
-          {variantWrapper(hotSpot)}
+          <slot name="variant" />
         {/if}
       </li>
     {/each}

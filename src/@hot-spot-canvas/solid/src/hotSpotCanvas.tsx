@@ -16,10 +16,7 @@ export type HotSpotCanvasViewModel<T = any> = {
 };
 export type HotSpotCanvasProps<T = any> = {
   siteHost: string;
-  hero: HotSpotCanvasViewModel<T>;
-  pageWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
-  productWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
-  variantWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
+  model: HotSpotCanvasViewModel<T>;
 };
 
 export function getContentUrl(siteHost: string, hotSpot: HotSpotViewModel) {
@@ -38,9 +35,9 @@ export function urlJoin(origin: string, parts: Array<string>) {
 
 function HotSpotCanvas(props: HotSpotCanvasProps) {
   function createImageUrl(props: HotSpotCanvasProps) {
-    const imageUrl = new URL(props.hero.imageUrl, props.siteHost);
-    imageUrl.searchParams.append("w", props.hero.canvasWidth.toString());
-    imageUrl.searchParams.append("h", props.hero.canvasHeight.toString());
+    const imageUrl = new URL(props.model.imageUrl, props.siteHost);
+    imageUrl.searchParams.append("w", props.model.canvasWidth.toString());
+    imageUrl.searchParams.append("h", props.model.canvasHeight.toString());
     imageUrl.searchParams.append("mode", "crop");
     return imageUrl.toString();
   }
@@ -49,41 +46,43 @@ function HotSpotCanvas(props: HotSpotCanvasProps) {
     <div
       class="hot-spot-canvas"
       style={{
-        width: `${props.hero.canvasWidth}px`,
-        height: `${props.hero.canvasHeight}px`,
+        width: `${props.model.canvasWidth}px`,
+        height: `${props.model.canvasHeight}px`,
       }}
     >
       <img
         src={createImageUrl(props)}
-        width={props.hero.canvasWidth}
-        height={props.hero.canvasHeight}
+        width={props.model.canvasWidth}
+        height={props.model.canvasHeight}
       />
       <ul>
-        <For each={props.hero.hotSpots}>
+        <For each={props.model.hotSpots}>
           {(hotSpot, _index) => {
             const index = _index();
             return (
-              <>
-                <li
-                  class="hot-spot-canvas-hot-spot"
-                  style={{
-                    left: `${hotSpot.coordinates.x}px`,
-                    top: `${hotSpot.coordinates.y}px`,
-                  }}
-                >
-                  <Show when={hotSpot.content.contentType.includes("Page")}>
-                    {props.pageWrapper(hotSpot)}
-                  </Show>
-                  <Show when={hotSpot.content.contentType.includes("Product")}>
-                    {props.productWrapper(hotSpot)}
-                  </Show>
-                  <Show
-                    when={hotSpot.content.contentType.includes("Variation")}
-                  >
-                    {props.variantWrapper(hotSpot)}
-                  </Show>
-                </li>
-              </>
+              <li
+                class="hot-spot-canvas-hot-spot"
+                style={{
+                  left: `${hotSpot.coordinates.x}px`,
+                  top: `${hotSpot.coordinates.y}px`,
+                }}
+              >
+                <Show when={hotSpot.content.contentType.includes("Page")}>
+                  <>
+                    <Slot name="page" hotSpot={hotSpot}></Slot>
+                  </>
+                </Show>
+                <Show when={hotSpot.content.contentType.includes("Product")}>
+                  <>
+                    <Slot name="product" hotSpot={hotSpot}></Slot>
+                  </>
+                </Show>
+                <Show when={hotSpot.content.contentType.includes("Variation")}>
+                  <>
+                    <Slot name="variant" hotSpot={hotSpot}></Slot>
+                  </>
+                </Show>
+              </li>
             );
           }}
         </For>

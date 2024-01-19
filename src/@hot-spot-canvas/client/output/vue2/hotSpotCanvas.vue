@@ -2,34 +2,36 @@
   <div
     class="hot-spot-canvas"
     :style="{
-      width: `${hero.canvasWidth}px`,
-      height: `${hero.canvasHeight}px`,
+      width: `${model.canvasWidth}px`,
+      height: `${model.canvasHeight}px`,
     }"
   >
     <img
       :src="createImageUrl(props)"
-      :width="hero.canvasWidth"
-      :height="hero.canvasHeight"
+      :width="model.canvasWidth"
+      :height="model.canvasHeight"
     />
 
     <ul>
       <li
         class="hot-spot-canvas-hot-spot"
+        v-for="(hotSpot, index) in model.hotSpots"
         :style="{
           left: `${hotSpot.coordinates.x}px`,
           top: `${hotSpot.coordinates.y}px`,
         }"
+        :key="index"
       >
         <template v-if="hotSpot.content.contentType.includes('Page')">
-          {{ pageWrapper(hotSpot) }}
+          <slot name="page"></slot>
         </template>
 
         <template v-if="hotSpot.content.contentType.includes('Product')">
-          {{ productWrapper(hotSpot) }}
+          <slot name="product"></slot>
         </template>
 
         <template v-if="hotSpot.content.contentType.includes('Variation')">
-          {{ variantWrapper(hotSpot) }}
+          <slot name="variant"></slot>
         </template>
       </li>
     </ul>
@@ -67,28 +69,19 @@ export type HotSpotCanvasViewModel<T = any> = {
 };
 export type HotSpotCanvasProps<T = any> = {
   siteHost: string;
-  hero: HotSpotCanvasViewModel<T>;
-  pageWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
-  productWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
-  variantWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
+  model: HotSpotCanvasViewModel<T>;
 };
 
 export default {
   name: "hot-spot-canvas",
 
-  props: [
-    "hero",
-    "siteHost",
-    "pageWrapper",
-    "productWrapper",
-    "variantWrapper",
-  ],
+  props: ["model", "siteHost"],
 
   methods: {
     createImageUrl: function createImageUrl(props: HotSpotCanvasProps) {
-      const imageUrl = new URL(this.hero.imageUrl, this.siteHost);
-      imageUrl.searchParams.append("w", this.hero.canvasWidth.toString());
-      imageUrl.searchParams.append("h", this.hero.canvasHeight.toString());
+      const imageUrl = new URL(this.model.imageUrl, this.siteHost);
+      imageUrl.searchParams.append("w", this.model.canvasWidth.toString());
+      imageUrl.searchParams.append("h", this.model.canvasHeight.toString());
       imageUrl.searchParams.append("mode", "crop");
       return imageUrl.toString();
     },

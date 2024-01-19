@@ -4,9 +4,12 @@ import { readFile } from 'node:fs/promises';
 // or any of these: https://vitejs.dev/plugins/ to make imports work
 import { createFilter, type Plugin, type ResolvedConfig } from 'vite';
 
-import { parseJsx, MitosisConfig, targets, getComponentFileExtensionForTarget } from '@builder.io/mitosis';
+import { parseJsx, MitosisConfig as OriginalMitosisConfig, targets, getComponentFileExtensionForTarget, ToVueOptions } from '@builder.io/mitosis';
 
-export const mitosisPlugin = (isDev: boolean, config: Partial<Omit<MitosisConfig, 'files'>> | Pick<MitosisConfig, 'targets'> = {}): Plugin => {
+export type MitosisConfig = Partial<Omit<OriginalMitosisConfig, 'files'>> & Pick<OriginalMitosisConfig, 'targets'>
+export const defineConfig = (config: MitosisConfig): MitosisConfig => config;
+
+export const mitosisPlugin = (isDev: boolean, config: MitosisConfig): Plugin => {
 
     const pluginName = 'vite:mitosis';
 
@@ -50,7 +53,12 @@ export const mitosisPlugin = (isDev: boolean, config: Partial<Omit<MitosisConfig
 					type: 'filename',
 					isTypescript: true
 				 });
-				const transpiler = target({ typescript: true, api: targetKey === 'vue2' ? 'options' : 'composition', defineComponent: targetKey === 'vue3' })
+				const vueConfig = config.options?.[targetKey] as ToVueOptions;
+				const api = vueConfig?.api || 'options'
+				const defineComponent = vueConfig?.defineComponent || false
+
+				console.log(targetKey, defineComponent)
+				const transpiler = target({ typescript: true, api, defineComponent })
 				const transpiledComponent = transpiler({ component: jsonTree })
 				
 				this.emitFile({

@@ -1,9 +1,11 @@
 {
-  "name": "@epi-ui-hot-spot-canvas/vue3",
+  "name": "@epi-ui-hot-spot-canvas/client",
+  "private": true,
   "version": "1.0.0",
   "description": "An EpiServer editor component to manage HotSpots on an image",
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "watch": "vite watch"
   },
   "repository": {
     "type": "git",
@@ -22,8 +24,8 @@
     "node": "20.10.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.3",
     "vite": "^5.0.10",
+    "vite-plugin-multiple": "^0.2.0",
     "vite-plugin-typescript": "^1.0.4"
   }
 }

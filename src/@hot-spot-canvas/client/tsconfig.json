@@ -8,6 +8,7 @@
     "lib/**.tsx"
    ],
   "exclude": [
-    "mitosis.config.js"
+    "mitosis.config.ts",
+    "output/**.*"
   ]
 }

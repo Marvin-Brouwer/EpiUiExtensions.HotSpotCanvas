@@ -2,19 +2,19 @@ import packageConfig from './package.json';
 import path from 'path';
 import { defineConfig } from 'vite';
 import mitosis from './vite-plugins/mitosis.plugin';
+import mitosisConfig from './vite-plugins/mitosis.config';
 import copy from 'rollup-plugin-copy';
 
 const isDev = process.argv.join(' ').includes('--mode development');
-const entry = path.resolve(__dirname, 'lib/hotSpotCanvas.lite.tsx');
+const entry = path.resolve(__dirname, 'lib/*.lite.tsx');
 const packageNameDefinition = packageConfig.name.split('/');
 const packageName = packageNameDefinition[1];
 const outputDir = 'output';
 
+
 export default defineConfig({
 	plugins: [
-		mitosis(isDev, {
-			targets: ['vue3', 'vue2', 'solid', 'svelte', 'react']
-		}),
+		mitosis(isDev, mitosisConfig),
 		copy({ 
 			targets: [
 				{ src: outputDir + '/vue3/*', dest: '../vue3/src'},
@@ -22,7 +22,10 @@ export default defineConfig({
 				{ src: outputDir + '/solid/*', dest: '../solid/src'},
 				{ src: outputDir + '/svelte/*', dest: '../svelte/src'},
 				{ src: outputDir + '/react/*', dest: '../react/src'},
-			]
+			],
+			errorOnExist: false,
+			overwrite: true,
+			hook: 'closeBundle'
 		})
 	],
 	build: {

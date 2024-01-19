@@ -16,10 +16,7 @@ export type HotSpotCanvasViewModel<T = any> = {
 };
 export type HotSpotCanvasProps<T = any> = {
   siteHost: string;
-  hero: HotSpotCanvasViewModel<T>;
-  pageWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
-  productWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
-  variantWrapper: (hotSpot: HotSpotViewModel<T>) => Element;
+  model: HotSpotCanvasViewModel<T>;
 };
 
 export function getContentUrl(siteHost: string, hotSpot: HotSpotViewModel) {
@@ -38,9 +35,9 @@ export function urlJoin(origin: string, parts: Array<string>) {
 
 function HotSpotCanvas(props: HotSpotCanvasProps) {
   function createImageUrl(props: HotSpotCanvasProps) {
-    const imageUrl = new URL(props.hero.imageUrl, props.siteHost);
-    imageUrl.searchParams.append("w", props.hero.canvasWidth.toString());
-    imageUrl.searchParams.append("h", props.hero.canvasHeight.toString());
+    const imageUrl = new URL(props.model.imageUrl, props.siteHost);
+    imageUrl.searchParams.append("w", props.model.canvasWidth.toString());
+    imageUrl.searchParams.append("h", props.model.canvasHeight.toString());
     imageUrl.searchParams.append("mode", "crop");
     return imageUrl.toString();
   }
@@ -49,39 +46,43 @@ function HotSpotCanvas(props: HotSpotCanvasProps) {
     <div
       className="hot-spot-canvas"
       style={{
-        width: `${props.hero.canvasWidth}px`,
-        height: `${props.hero.canvasHeight}px`,
+        width: `${props.model.canvasWidth}px`,
+        height: `${props.model.canvasHeight}px`,
       }}
     >
       <img
         src={createImageUrl(props)}
-        width={props.hero.canvasWidth}
-        height={props.hero.canvasHeight}
+        width={props.model.canvasWidth}
+        height={props.model.canvasHeight}
       />
 
       <ul>
-        {props.hero.hotSpots?.map((hotSpot) => (
-          <>
-            <li
-              className="hot-spot-canvas-hot-spot"
-              style={{
-                left: `${hotSpot.coordinates.x}px`,
-                top: `${hotSpot.coordinates.y}px`,
-              }}
-            >
-              {hotSpot.content.contentType.includes("Page") ? (
-                <>{props.pageWrapper(hotSpot)}</>
-              ) : null}
+        {props.model.hotSpots?.map((hotSpot) => (
+          <li
+            className="hot-spot-canvas-hot-spot"
+            style={{
+              left: `${hotSpot.coordinates.x}px`,
+              top: `${hotSpot.coordinates.y}px`,
+            }}
+          >
+            {hotSpot.content.contentType.includes("Page") ? (
+              <>
+                <>{props.slotPage}</>
+              </>
+            ) : null}
 
-              {hotSpot.content.contentType.includes("Product") ? (
-                <>{props.productWrapper(hotSpot)}</>
-              ) : null}
+            {hotSpot.content.contentType.includes("Product") ? (
+              <>
+                <>{props.slotProduct}</>
+              </>
+            ) : null}
 
-              {hotSpot.content.contentType.includes("Variation") ? (
-                <>{props.variantWrapper(hotSpot)}</>
-              ) : null}
-            </li>
-          </>
+            {hotSpot.content.contentType.includes("Variation") ? (
+              <>
+                <>{props.slotVariant}</>
+              </>
+            ) : null}
+          </li>
         ))}
       </ul>
     </div>

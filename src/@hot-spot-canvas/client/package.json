@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "An EpiServer editor component to manage HotSpots on an image",
   "scripts": {
+    "dev": "pnpm build --mode development --watch",
     "build": "vite build"
   },
   "repository": {

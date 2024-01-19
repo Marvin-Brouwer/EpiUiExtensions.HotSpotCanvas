@@ -1,0 +1,7 @@
+output/
+dist/
+node_modules/
+
+src/**/output/
+src/**/dist/
+src/**/node_modules/
