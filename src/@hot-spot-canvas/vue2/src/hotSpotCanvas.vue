@@ -1,37 +1,57 @@
 <template>
   <div
     class="hot-spot-canvas"
+    v-if="!!model"
     :style="{
-      width: `${model.canvasWidth}px`,
-      height: `${model.canvasHeight}px`,
+      margin: '10px',
+      display: 'flex',
+      position: 'relative',
+      overflow: 'visible',
+      width: `${canvasWidth(props)}px`,
+      height: `${canvasHeight(props)}px`,
     }"
   >
     <img
       :src="createImageUrl(props)"
-      :width="model.canvasWidth"
-      :height="model.canvasHeight"
+      :width="canvasWidth(props)"
+      :height="canvasHeight(props)"
     />
 
-    <ul>
+    <ul
+      :style="{
+        display: 'inline-flex',
+        listStyle: 'none',
+        margin: '0',
+        padding: '0',
+        overflow: 'visible',
+      }"
+    >
       <li
         class="hot-spot-canvas-hot-spot"
         v-for="(hotSpot, index) in model.hotSpots"
         :style="{
+          display: 'flex',
+          listStyle: 'none',
+          margin: '0',
+          padding: '0',
+          overflow: 'visible',
+          position: 'absolute',
+          textDecoration: 'none',
           left: `${hotSpot.coordinates.x}px`,
           top: `${hotSpot.coordinates.y}px`,
         }"
         :key="index"
       >
         <template v-if="hotSpot.content.contentType.includes('Page')">
-          <slot name="page"></slot>
+          <slot name="page" :hotSpot={...hotSpot}></slot>
         </template>
 
         <template v-if="hotSpot.content.contentType.includes('Product')">
-          <slot name="product"></slot>
+          <slot name="product" :hotSpot={...hotSpot}></slot>
         </template>
 
         <template v-if="hotSpot.content.contentType.includes('Variation')">
-          <slot name="variant"></slot>
+          <slot name="variant" :hotSpot={...hotSpot}></slot>
         </template>
       </li>
     </ul>
@@ -79,11 +99,24 @@ export default {
 
   methods: {
     createImageUrl: function createImageUrl(props: HotSpotCanvasProps) {
+      if (!this.model) return null;
       const imageUrl = new URL(this.model.imageUrl, this.siteHost);
-      imageUrl.searchParams.append("w", this.model.canvasWidth.toString());
-      imageUrl.searchParams.append("h", this.model.canvasHeight.toString());
+      imageUrl.searchParams.append(
+        "w",
+        this.canvasWidth(this.props).toString()
+      );
+      imageUrl.searchParams.append(
+        "h",
+        this.canvasHeight(this.props).toString()
+      );
       imageUrl.searchParams.append("mode", "crop");
       return imageUrl.toString();
+    },
+    canvasWidth: function canvasWidth(props: HotSpotCanvasProps) {
+      return this.model?.canvasWidth ?? 0;
+    },
+    canvasHeight: function canvasHeight(props: HotSpotCanvasProps) {
+      return this.model?.canvasHeight ?? 0;
     },
   },
 };

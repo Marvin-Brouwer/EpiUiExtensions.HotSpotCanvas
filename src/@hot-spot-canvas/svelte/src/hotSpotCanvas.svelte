@@ -50,48 +50,76 @@
   }
 
   function createImageUrl(props: HotSpotCanvasProps) {
+    if (!model) return null;
     const imageUrl = new URL(model.imageUrl, siteHost);
-    imageUrl.searchParams.append("w", model.canvasWidth.toString());
-    imageUrl.searchParams.append("h", model.canvasHeight.toString());
+    imageUrl.searchParams.append("w", canvasWidth(props).toString());
+    imageUrl.searchParams.append("h", canvasHeight(props).toString());
     imageUrl.searchParams.append("mode", "crop");
     return imageUrl.toString();
   }
+  function canvasWidth(props: HotSpotCanvasProps) {
+    return model?.canvasWidth ?? 0;
+  }
+  function canvasHeight(props: HotSpotCanvasProps) {
+    return model?.canvasHeight ?? 0;
+  }
 </script>
 
-<div
-  use:mitosis_styling={{
-    width: `${model.canvasWidth}px`,
-    height: `${model.canvasHeight}px`,
-  }}
-  class="hot-spot-canvas"
->
-  <img
-    src={createImageUrl(props)}
-    width={model.canvasWidth}
-    height={model.canvasHeight}
-  />
+{#if !!model}
+  <div
+    use:mitosis_styling={{
+      margin: "10px",
+      display: "flex",
+      position: "relative",
+      overflow: "visible",
+      width: `${canvasWidth(props)}px`,
+      height: `${canvasHeight(props)}px`,
+    }}
+    class="hot-spot-canvas"
+  >
+    <img
+      src={createImageUrl(props)}
+      width={canvasWidth(props)}
+      height={canvasHeight(props)}
+    />
 
-  <ul>
-    {#each model.hotSpots as hotSpot}
-      <li
-        use:mitosis_styling={{
-          left: `${hotSpot.coordinates.x}px`,
-          top: `${hotSpot.coordinates.y}px`,
-        }}
-        class="hot-spot-canvas-hot-spot"
-      >
-        {#if hotSpot.content.contentType.includes("Page")}
-          <slot name="page" />
-        {/if}
+    <ul
+      use:mitosis_styling={{
+        display: "inline-flex",
+        listStyle: "none",
+        margin: "0",
+        padding: "0",
+        overflow: "visible",
+      }}
+    >
+      {#each model.hotSpots as hotSpot}
+        <li
+          use:mitosis_styling={{
+            display: "flex",
+            listStyle: "none",
+            margin: "0",
+            padding: "0",
+            overflow: "visible",
+            position: "absolute",
+            textDecoration: "none",
+            left: `${hotSpot.coordinates.x}px`,
+            top: `${hotSpot.coordinates.y}px`,
+          }}
+          class="hot-spot-canvas-hot-spot"
+        >
+          {#if hotSpot.content.contentType.includes("Page")}
+            <slot name="page" />
+          {/if}
 
-        {#if hotSpot.content.contentType.includes("Product")}
-          <slot name="product" />
-        {/if}
+          {#if hotSpot.content.contentType.includes("Product")}
+            <slot name="product" />
+          {/if}
 
-        {#if hotSpot.content.contentType.includes("Variation")}
-          <slot name="variant" />
-        {/if}
-      </li>
-    {/each}
-  </ul>
-</div>
+          {#if hotSpot.content.contentType.includes("Variation")}
+            <slot name="variant" />
+          {/if}
+        </li>
+      {/each}
+    </ul>
+  </div>
+{/if}

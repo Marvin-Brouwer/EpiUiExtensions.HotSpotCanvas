@@ -24,46 +24,90 @@ export type HotSpotCanvasProps<T = any> = {
 export default function HotSpotCanvas(props: HotSpotCanvasProps) {
 
   function createImageUrl(props: HotSpotCanvasProps) {
+
+    if (!props?.model) return null;
     
     const imageUrl = new URL(props.model.imageUrl, props.siteHost)
-    imageUrl.searchParams.append('w', props.model.canvasWidth.toString());
-    imageUrl.searchParams.append('h', props.model.canvasHeight.toString());
+    imageUrl.searchParams.append('w', canvasWidth(props).toString());
+    imageUrl.searchParams.append('h', canvasHeight(props).toString());
     imageUrl.searchParams.append('mode', 'crop');
   
     return imageUrl.toString();
   }
 
-  console.log('hotSpot', props.model.hotSpots)
-  return (
-    <div class="hot-spot-canvas" style={{ width: `${props.model.canvasWidth}px`, height: `${props.model.canvasHeight}px` }}>
-		<img src={createImageUrl(props)} width={props.model.canvasWidth} height={props.model.canvasHeight} />
+  function canvasWidth(props: HotSpotCanvasProps) {
 
-		<ul>
-      <For each={props.model.hotSpots} >
-      {
-        (hotSpot) => (
-          <li style={{ left: `${hotSpot.coordinates.x}px`, top: `${hotSpot.coordinates.y}px`}} class="hot-spot-canvas-hot-spot">
-            <Show when={hotSpot.content.contentType.includes('Page')}>
-              <>
-                <Slot name="page" hotSpot={hotSpot} />
-              </>
-            </Show>
-            <Show when={hotSpot.content.contentType.includes('Product')}>
-              <>
-                <Slot name="product" hotSpot={hotSpot}/>
-              </>
-            </Show>
-            <Show when={hotSpot.content.contentType.includes('Variation')}>
-              <>
-                <Slot name="variant" hotSpot={hotSpot}/>
-              </>
-            </Show>
-          </li>
-        )
-      }
-      </For>
-    </ul>
-  </div>
+    return props?.model?.canvasWidth ?? 0;
+  }
+
+  function canvasHeight(props: HotSpotCanvasProps) {
+
+    return props?.model?.canvasHeight ?? 0;
+  }
+
+  return (
+    <Show when={!!props?.model}>
+      <div 
+        class="hot-spot-canvas" 
+        style={{
+          margin: "10px",
+          display: "flex",
+          position: "relative",
+          overflow: "visible",
+          width: `${canvasWidth(props)}px`, 
+          height: `${canvasHeight(props)}px` 
+        }}
+      >
+      <img src={createImageUrl(props)} width={canvasWidth(props)} height={canvasHeight(props)} />
+
+      <ul
+        style={{
+          display: 'inline-flex',
+          listStyle: 'none',
+          margin: '0',
+          padding: '0',
+          overflow: 'visible',
+        }}
+      >
+        <For each={props.model.hotSpots} >
+        {
+          (hotSpot) => (
+            <li 
+            class="hot-spot-canvas-hot-spot"
+            style={{
+              display: 'flex',
+              listStyle: 'none',
+              margin: '0',
+              padding: '0',
+              overflow: 'visible',
+              position: 'absolute',
+              textDecoration: 'none',
+              left: `${hotSpot.coordinates.x}px`, 
+              top: `${hotSpot.coordinates.y}px`
+            }}
+          >
+              <Show when={hotSpot.content.contentType.includes('Page')}>
+                <>
+                  <Slot name="page" hotSpot={hotSpot} />
+                </>
+              </Show>
+              <Show when={hotSpot.content.contentType.includes('Product')}>
+                <>
+                  <Slot name="product" hotSpot={hotSpot}/>
+                </>
+              </Show>
+              <Show when={hotSpot.content.contentType.includes('Variation')}>
+                <>
+                  <Slot name="variant" hotSpot={hotSpot}/>
+                </>
+              </Show>
+            </li>
+          )
+        }
+        </For>
+      </ul>
+    </div>  
+  </Show>
   );
 }
 

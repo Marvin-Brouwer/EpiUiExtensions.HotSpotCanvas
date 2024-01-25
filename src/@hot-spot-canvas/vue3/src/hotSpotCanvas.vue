@@ -1,41 +1,62 @@
 <template>
-  <div
-    class="hot-spot-canvas"
-    :style="{
-      width: `${model.canvasWidth}px`,
-      height: `${model.canvasHeight}px`,
-    }"
-  >
-    <img
-      :src="createImageUrl(props)"
-      :width="model.canvasWidth"
-      :height="model.canvasHeight"
-    />
+  <template v-if="!!model">
+    <div
+      class="hot-spot-canvas"
+      :style="{
+        margin: '10px',
+        display: 'flex',
+        position: 'relative',
+        overflow: 'visible',
+        width: `${canvasWidth(props)}px`,
+        height: `${canvasHeight(props)}px`,
+      }"
+    >
+      <img
+        :src="createImageUrl(props)"
+        :width="canvasWidth(props)"
+        :height="canvasHeight(props)"
+      />
 
-    <ul>
-      <template :key="index" v-for="(hotSpot, index) in model.hotSpots">
-        <li
-          class="hot-spot-canvas-hot-spot"
-          :style="{
-            left: `${hotSpot.coordinates.x}px`,
-            top: `${hotSpot.coordinates.y}px`,
-          }"
-        >
-          <template v-if="hotSpot.content.contentType.includes('Page')">
-            <slot name="page"></slot>
-          </template>
+      <ul
+        :style="{
+          display: 'inline-flex',
+          listStyle: 'none',
+          margin: '0',
+          padding: '0',
+          overflow: 'visible',
+        }"
+      >
+        <template :key="index" v-for="(hotSpot, index) in model.hotSpots">
+          <li
+            class="hot-spot-canvas-hot-spot"
+            :style="{
+              display: 'flex',
+              listStyle: 'none',
+              margin: '0',
+              padding: '0',
+              overflow: 'visible',
+              position: 'absolute',
+              textDecoration: 'none',
+              left: `${hotSpot.coordinates.x}px`,
+              top: `${hotSpot.coordinates.y}px`,
+            }"
+          >
+            <template v-if="hotSpot.content.contentType.includes('Page')">
+              <slot name="page"></slot>
+            </template>
 
-          <template v-if="hotSpot.content.contentType.includes('Product')">
-            <slot name="product"></slot>
-          </template>
+            <template v-if="hotSpot.content.contentType.includes('Product')">
+              <slot name="product"></slot>
+            </template>
 
-          <template v-if="hotSpot.content.contentType.includes('Variation')">
-            <slot name="variant"></slot>
-          </template>
-        </li>
-      </template>
-    </ul>
-  </div>
+            <template v-if="hotSpot.content.contentType.includes('Variation')">
+              <slot name="variant"></slot>
+            </template>
+          </li>
+        </template>
+      </ul>
+    </div>
+  </template>
 </template>
 
 <script lang="ts">
@@ -81,11 +102,24 @@ export default defineComponent({
 
   methods: {
     createImageUrl: function createImageUrl(props: HotSpotCanvasProps) {
+      if (!this.model) return null;
       const imageUrl = new URL(this.model.imageUrl, this.siteHost);
-      imageUrl.searchParams.append("w", this.model.canvasWidth.toString());
-      imageUrl.searchParams.append("h", this.model.canvasHeight.toString());
+      imageUrl.searchParams.append(
+        "w",
+        this.canvasWidth(this.props).toString()
+      );
+      imageUrl.searchParams.append(
+        "h",
+        this.canvasHeight(this.props).toString()
+      );
       imageUrl.searchParams.append("mode", "crop");
       return imageUrl.toString();
+    },
+    canvasWidth: function canvasWidth(props: HotSpotCanvasProps) {
+      return this.model?.canvasWidth ?? 0;
+    },
+    canvasHeight: function canvasHeight(props: HotSpotCanvasProps) {
+      return this.model?.canvasHeight ?? 0;
     },
   },
 });

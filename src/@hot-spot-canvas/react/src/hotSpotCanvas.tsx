@@ -35,57 +35,91 @@ export function urlJoin(origin: string, parts: Array<string>) {
 
 function HotSpotCanvas(props: HotSpotCanvasProps) {
   function createImageUrl(props: HotSpotCanvasProps) {
+    if (!props?.model) return null;
     const imageUrl = new URL(props.model.imageUrl, props.siteHost);
-    imageUrl.searchParams.append("w", props.model.canvasWidth.toString());
-    imageUrl.searchParams.append("h", props.model.canvasHeight.toString());
+    imageUrl.searchParams.append("w", canvasWidth(props).toString());
+    imageUrl.searchParams.append("h", canvasHeight(props).toString());
     imageUrl.searchParams.append("mode", "crop");
     return imageUrl.toString();
   }
 
-  return (
-    <div
-      className="hot-spot-canvas"
-      style={{
-        width: `${props.model.canvasWidth}px`,
-        height: `${props.model.canvasHeight}px`,
-      }}
-    >
-      <img
-        src={createImageUrl(props)}
-        width={props.model.canvasWidth}
-        height={props.model.canvasHeight}
-      />
+  function canvasWidth(props: HotSpotCanvasProps) {
+    return props?.model?.canvasWidth ?? 0;
+  }
 
-      <ul>
-        {props.model.hotSpots?.map((hotSpot) => (
-          <li
-            className="hot-spot-canvas-hot-spot"
+  function canvasHeight(props: HotSpotCanvasProps) {
+    return props?.model?.canvasHeight ?? 0;
+  }
+
+  return (
+    <>
+      {!!props?.model ? (
+        <>
+          <div
+            className="hot-spot-canvas"
             style={{
-              left: `${hotSpot.coordinates.x}px`,
-              top: `${hotSpot.coordinates.y}px`,
+              margin: "10px",
+              display: "flex",
+              position: "relative",
+              overflow: "visible",
+              width: `${canvasWidth(props)}px`,
+              height: `${canvasHeight(props)}px`,
             }}
           >
-            {hotSpot.content.contentType.includes("Page") ? (
-              <>
-                <>{props.slotPage}</>
-              </>
-            ) : null}
+            <img
+              src={createImageUrl(props)}
+              width={canvasWidth(props)}
+              height={canvasHeight(props)}
+            />
 
-            {hotSpot.content.contentType.includes("Product") ? (
-              <>
-                <>{props.slotProduct}</>
-              </>
-            ) : null}
+            <ul
+              style={{
+                display: "inline-flex",
+                listStyle: "none",
+                margin: "0",
+                padding: "0",
+                overflow: "visible",
+              }}
+            >
+              {props.model.hotSpots?.map((hotSpot) => (
+                <li
+                  className="hot-spot-canvas-hot-spot"
+                  style={{
+                    display: "flex",
+                    listStyle: "none",
+                    margin: "0",
+                    padding: "0",
+                    overflow: "visible",
+                    position: "absolute",
+                    textDecoration: "none",
+                    left: `${hotSpot.coordinates.x}px`,
+                    top: `${hotSpot.coordinates.y}px`,
+                  }}
+                >
+                  {hotSpot.content.contentType.includes("Page") ? (
+                    <>
+                      <>{props.slotPage}</>
+                    </>
+                  ) : null}
 
-            {hotSpot.content.contentType.includes("Variation") ? (
-              <>
-                <>{props.slotVariant}</>
-              </>
-            ) : null}
-          </li>
-        ))}
-      </ul>
-    </div>
+                  {hotSpot.content.contentType.includes("Product") ? (
+                    <>
+                      <>{props.slotProduct}</>
+                    </>
+                  ) : null}
+
+                  {hotSpot.content.contentType.includes("Variation") ? (
+                    <>
+                      <>{props.slotVariant}</>
+                    </>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      ) : null}
+    </>
   );
 }
 

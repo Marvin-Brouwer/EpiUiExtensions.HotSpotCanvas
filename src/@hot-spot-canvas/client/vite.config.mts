@@ -6,7 +6,7 @@ import mitosisConfig from './vite-plugins/mitosis.config';
 import copy from 'rollup-plugin-copy';
 
 const isDev = process.argv.join(' ').includes('--mode development');
-const entry = path.resolve(__dirname, 'lib/*.lite.tsx');
+const entry = path.resolve(__dirname, 'lib/hotSpotCanvas.lite.tsx');
 const packageNameDefinition = packageConfig.name.split('/');
 const packageName = packageNameDefinition[1];
 const outputDir = 'output';
