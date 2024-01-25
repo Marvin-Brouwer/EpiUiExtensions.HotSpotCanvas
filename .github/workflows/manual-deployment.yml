@@ -1,0 +1,212 @@
+name: Manual Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Define the version to be published (SemVer)'
+        required: true
+        type: string
+
+jobs:
+  nuget-push:
+    name: "Push NuGet"
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: GitHub https://github.com/NL-Valtech/EpiServer.HotspotHero/pkgs
+      # The version does not correspond so we can't link directly
+      url: "https://github.com/NL-Valtech/EpiServer.HotspotHero/pkgs/nuget/EpiServer.HotspotHero"
+
+    steps:
+    ###
+    # Checkout repository
+    ###
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        lfs: true
+    ###
+    # 🧰 Setup PNPM
+    ###
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 7
+    - name: Use Node.js 18.12.1
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.12.1
+        cache: 'pnpm'
+    ###
+    # 🧰 Setup .Net
+    #
+    # Configure the pipeline to use the correct .Net sdk versions
+    ###
+    - name: 🧰 Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          7.0.x
+    ###
+    # 🔧 Fix version
+    #
+    # Override the libraries version info
+    ###
+    - name: 🔧 Fix version
+      shell: pwsh
+      run: |-
+        ${{github.workspace}}/.github/workflows/scripts/update-version.ps1 `
+          -Version "${{ github.event.inputs.version }}" `
+          -File "${{github.workspace}}/src/EpiServer.HotspotHero/EpiServer.HotspotHero.csproj";
+    ###
+    # 🗃 Configure Nuget Sources
+    #
+    # Add third party nuget Sources and set GitHub Packages as NuGet source
+    ###
+    - name: 🗃 Configure Nuget Sources
+      run: >-
+        dotnet nuget add source
+        "https://nuget.pkg.github.com/NL-Valtech/index.json"
+        --username ${{ github.actor }}
+        --password ${{ github.token }}
+        --store-password-in-clear-text
+        --name GitHubPackages
+
+        dotnet nuget add source
+        "https://nuget.episerver.com/feed/packages.svc/"
+        --name EpiServer
+
+        dotnet nuget add source
+        "https://nuget.optimizely.com/feed/packages.svc"
+        --name Optimizely
+
+        dotnet nuget list source
+        --format Detailed
+    ###
+    # 🗃 Restore dependencies
+    #
+    # Fill the PNPM store with necessary libraries
+    ###
+    - name: 🗃 Restore dependencies
+      run: |-
+        pnpm i
+        pnpm i --recursive
+        pnpm i rimraf -g
+    ###
+    # 🛠 pnpm build
+    #
+    # This needs to happen before dotnet build, so that the dis folder is available
+    ###
+    - name: 🛠 pnpm build
+      run: |-
+        pnpm build
+      working-directory: ${{github.workspace}}/src/EpiServer.HotspotHero/episerver-hotspot-hero-cms
+    ###
+    # 🛠 DotNet Build
+    #
+    # Build the library code for later use
+    ###
+    - name: 🛠 DotNet Build
+      run: >-
+        dotnet build
+        "${{github.workspace}}/src/EpiServer.HotspotHero/EpiServer.HotspotHero.csproj"
+        --nologo
+        --configuration "Release"
+        -p:Version=${{ github.event.inputs.version }}
+    ###
+    # 🗳 Push package
+    #
+    # Pack and push the package
+    ###
+    - name: 🗳 Push package
+      run: >-
+        dotnet nuget push
+        ${{github.workspace}}/src/EpiServer.HotspotHero/bin/Release/EpiServer.HotspotHero.${{ github.event.inputs.version }}.nupkg
+        --api-key ${{ github.token }}
+        --no-symbols
+        --skip-duplicate
+        --source "GitHubPackages"
+  npm-push:
+    name: "Push NPM"
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: GitHub https://github.com/NL-Valtech/EpiServer.HotspotHero/pkgs
+      # The version does not correspond so we can't link directly
+      url: "https://github.com/NL-Valtech/EpiServer.HotspotHero/pkgs/npm/episerver-hotspot-hero"
+
+    steps:
+    ###
+    # Checkout repository
+    ###
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        lfs: true
+    ###
+    # 🧰 Setup PNPM
+    ###
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 7
+    - name: Use Node.js 18.12.1
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.12.1
+        cache: 'pnpm'
+    ###
+    # 🗃 Configure NPM Sources
+    #
+    # Add third party NPM Sources and set GitHub Packages as NPM source
+    # See: https://stackoverflow.com/questions/69839851/github-actions-copy-git-user-name-and-user-email-from-last-commit#comment134141008_72981982
+    # For why the email is constructed
+    ###
+    - name: 🗃 Configure NPM Sources
+      run: >-
+        pnpm i -g npm-cli-adduser
+
+        npm-cli-adduser
+        -u ${{ github.actor }}
+        -p ${{ github.token }}
+        -e "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+        -r https://npm.pkg.github.com
+    ###
+    # 🗃 Restore dependencies
+    #
+    # Fill the PNPM store with necessary libraries
+    ###
+    - name: 🗃 Restore dependencies
+      run: |-
+        pnpm i
+        pnpm i --recursive
+    ###
+    # 🔧 Fix version
+    #
+    # Override the libraries version info
+    ###
+    - name: 🔧 Fix version
+      run: >-
+        pnpm version "${{ github.event.inputs.version }}"
+      working-directory: ${{github.workspace}}/src/episerver-hotspot-hero
+    ###
+    # 🛠 pnpm build
+    ###
+    - name: 🛠 pnpm build
+      run: |-
+        pnpm build
+      working-directory: ${{github.workspace}}/src/episerver-hotspot-hero
+    ###
+    # 🗳 Push package
+    #
+    # Pack and push the package
+    ###
+    - name: 🗳 Push package
+      run: >-
+        pnpm publish
+        --registry=https://npm.pkg.github.com
+        --no-git-checks
+      env:
+        NODE_AUTH_TOKEN: ${{ github.token }}
+      working-directory: ${{github.workspace}}/src/episerver-hotspot-hero
