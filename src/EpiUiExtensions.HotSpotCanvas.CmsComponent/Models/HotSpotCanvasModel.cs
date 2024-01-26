@@ -6,8 +6,8 @@ namespace EpiUiExtensions.HotSpotCanvas.CmsComponent.Models;
 
 public sealed class HotSpotCanvasModel
 {
-    public float? CanvasWidth { get; set; }
-    public float? CanvasHeight { get; set; }
+    public decimal? CanvasWidth { get; set; }
+    public decimal? CanvasHeight { get; set; }
 
     /// <summary>
     /// The Image to show as canvas

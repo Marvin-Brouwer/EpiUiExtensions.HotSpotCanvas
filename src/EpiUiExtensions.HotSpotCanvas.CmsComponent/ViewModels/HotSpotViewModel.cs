@@ -1,4 +1,6 @@
-﻿using EpiUiExtensions.HotSpotCanvas.CmsComponent.Models;
+﻿using EPiServer.ContentApi.Core.Serialization.Models;
+
+using EpiUiExtensions.HotSpotCanvas.CmsComponent.Models;
 
 namespace EpiUiExtensions.HotSpotCanvas.CmsComponent.ViewModels;
 
@@ -10,12 +12,12 @@ public sealed class HotSpotViewModel
     /// <summary>
     /// Asset url for the <see cref="HotSpotModel.ContentReference"/>
     /// </summary>
-    public string ContentUrl { get; set; }
+    public string? ContentUrl { get; set; }
 
     /// <summary>
     /// Optimizely serialized content for <see cref="HotSpotModel.ContentReference"/>
     /// </summary>
-    public object Content { get; set; }
+    public ContentApiModel Content { get; set; }
 
     /// <summary>
     /// Position of the Hotspot relative to the canvas

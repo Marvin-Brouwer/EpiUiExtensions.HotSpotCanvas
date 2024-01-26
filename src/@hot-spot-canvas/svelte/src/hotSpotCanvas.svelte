@@ -1,42 +1,42 @@
 <script context="module" lang="ts">
+  export type Coordinate = {
+    x: number;
+    y: number;
+  };
+
   export type HotSpotViewModel<T = any> = {
     contentUrl: string;
-    coordinates: {
-      x: number;
-      y: number;
-    };
+    coordinates: Coordinate;
     content: T;
   };
 
   export type HotSpotCanvasViewModel<T = any> = {
-    canvasWidth: number;
-    canvasHeight: number;
+    canvasDimensions: {
+      defaultWidth: number;
+      defaultHeight: number;
+      aspectRatio: number;
+    };
     imageUrl: string;
     hotSpots: Array<HotSpotViewModel<T>>;
   };
 
   export type HotSpotCanvasProps<T = any> = {
     siteHost: string;
+    canvasWidth?: number;
+    canvasHeight?: number;
+    canvasAltText?: string;
     model: HotSpotCanvasViewModel<T>;
   };
 </script>
 
 <script lang="ts">
-  export function getContentUrl(siteHost: string, hotSpot: HotSpotViewModel) {
-    return pathJoin([siteHost, hotSpot.contentUrl]);
-  }
-  export function pathJoin(parts: Array<string>, separator: string = "/") {
-    var replace = new RegExp(separator + "{1,}", "g");
-    return ("/" + parts.join(separator)).replace(replace, separator);
-  }
-  export function urlJoin(origin: string, parts: Array<string>) {
-    const path = pathJoin(parts);
-    const url = new URL(origin);
-    url.pathname = path;
-    return url;
-  }
+  import { onMount } from "svelte";
 
   export let model: HotSpotCanvasProps["model"];
+  export let canvasAltText: HotSpotCanvasProps["canvasAltText"] =
+    "A canvas containing hot-spots referencing pages and products";
+  export let canvasWidth: HotSpotCanvasProps["canvasWidth"];
+  export let canvasHeight: HotSpotCanvasProps["canvasHeight"];
   export let siteHost: HotSpotCanvasProps["siteHost"];
 
   function mitosis_styling(node, vars) {
@@ -49,20 +49,60 @@
     });
   }
 
-  function createImageUrl(props: HotSpotCanvasProps) {
-    if (!model) return null;
-    const imageUrl = new URL(model.imageUrl, siteHost);
-    imageUrl.searchParams.append("w", canvasWidth(props).toString());
-    imageUrl.searchParams.append("h", canvasHeight(props).toString());
-    imageUrl.searchParams.append("mode", "crop");
-    return imageUrl.toString();
-  }
-  function canvasWidth(props: HotSpotCanvasProps) {
-    return model?.canvasWidth ?? 0;
-  }
-  function canvasHeight(props: HotSpotCanvasProps) {
-    return model?.canvasHeight ?? 0;
-  }
+  let canvasMetaData = {
+    width: model.canvasDimensions.defaultWidth,
+    height: model.canvasDimensions.defaultHeight,
+    imageWidth: model.canvasDimensions.defaultWidth,
+    imageHeight: model.canvasDimensions.defaultHeight,
+    url: undefined,
+  };
+
+  onMount(() => {
+    const calculateWidth = () => {
+      if (canvasWidth) return canvasWidth;
+      if (canvasHeight)
+        return canvasHeight / model.canvasDimensions.aspectRatio;
+      return model.canvasDimensions.defaultWidth;
+    };
+    const calculateHeight = () => {
+      if (canvasHeight) return canvasHeight;
+      if (canvasWidth) return canvasWidth * model.canvasDimensions.aspectRatio;
+      return model.canvasDimensions.defaultHeight;
+    };
+    const width = calculateWidth();
+    const height = calculateHeight();
+    if (height > width) {
+      canvasMetaData = {
+        ...canvasMetaData,
+        imageWidth: null,
+      };
+    } else {
+      canvasMetaData = {
+        ...canvasMetaData,
+        imageHeight: null,
+      };
+    }
+    const createImageUrl = () => {
+      if (!model) return null;
+      const imageUrl = new URL(model.imageUrl, siteHost);
+      if (canvasMetaData.imageWidth) {
+        imageUrl.searchParams.append("w", canvasMetaData.imageWidth.toString());
+      }
+      if (canvasMetaData.imageHeight) {
+        imageUrl.searchParams.append(
+          "h",
+          canvasMetaData.imageHeight.toString()
+        );
+      }
+      return imageUrl.toString();
+    };
+    canvasMetaData = {
+      ...canvasMetaData,
+      width,
+      height,
+      url: createImageUrl(),
+    };
+  });
 </script>
 
 {#if !!model}
@@ -72,16 +112,36 @@
       display: "flex",
       position: "relative",
       overflow: "visible",
-      width: `${canvasWidth(props)}px`,
-      height: `${canvasHeight(props)}px`,
+      width: `${canvasMetaData.width}px`,
+      height: `${canvasMetaData.height}px`,
     }}
     class="hot-spot-canvas"
   >
-    <img
-      src={createImageUrl(props)}
-      width={canvasWidth(props)}
-      height={canvasHeight(props)}
-    />
+    <div
+      use:mitosis_styling={{
+        margin: "0",
+        padding: "0",
+        position: "relative",
+        display: "flex",
+        overflow: "hidden",
+      }}
+    >
+      <img
+        use:mitosis_styling={{
+          margin: "0",
+          padding: "0",
+          position: "absolute",
+          display: "flex",
+          alignContent: "center",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        src={canvasMetaData.url}
+        width={canvasMetaData.imageWidth}
+        height={canvasMetaData.imageHeight}
+        alt={canvasAltText}
+      />
+    </div>
 
     <ul
       use:mitosis_styling={{
@@ -102,8 +162,8 @@
             overflow: "visible",
             position: "absolute",
             textDecoration: "none",
-            left: `${hotSpot.coordinates.x}px`,
-            top: `${hotSpot.coordinates.y}px`,
+            left: `${hotSpot.coordinates.x}%`,
+            top: `${hotSpot.coordinates.y}%`,
           }}
           class="hot-spot-canvas-hot-spot"
         >

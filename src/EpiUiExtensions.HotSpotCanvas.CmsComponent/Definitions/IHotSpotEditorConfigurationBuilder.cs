@@ -4,7 +4,7 @@ namespace EpiUiExtensions.HotSpotCanvas.CmsComponent.Definitions;
 
 public interface IHotSpotEditorConfigurationBuilder
 {
-    IHotSpotEditorConfigurationBuilder UseDimensions(float width, float height, float? offset = null);
+    IHotSpotEditorConfigurationBuilder UseDimensions(decimal width, decimal height, decimal? offset = null);
     IHotSpotEditorConfigurationBuilder UseMaximumHotSpots(short amount);
     IHotSpotEditorConfigurationBuilder UsePageTypes(params Type[] pageTypes);
     IHotSpotEditorConfigurationBuilder UseNoPageTypes();

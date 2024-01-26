@@ -3,4 +3,4 @@
 /// <summary>
 /// Hotspot coordinates
 /// </summary>
-public readonly record struct HotSpotCoordinates(float X, float Y);
+public readonly record struct HotSpotCoordinates(decimal X, decimal Y);

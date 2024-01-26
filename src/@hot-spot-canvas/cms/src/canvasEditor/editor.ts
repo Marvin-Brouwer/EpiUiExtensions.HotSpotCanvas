@@ -95,7 +95,14 @@ export default canvasEditorComponent(({ updateValue, element, getConfig, propert
 
 		log.debug('setting hero image', contentItem.publicUrl, `width: ${settings.canvasWidth}`, `height: ${settings.canvasHeight}`);
 
-		element("backdrop").style.backgroundImage = `url(${contentItem.publicUrl}?w=${settings.canvasWidth}&h=${settings.canvasHeight}&mode=crop)`;
+		// We solve this ourselves since image-resizer doesn't have a 'mode=cover'
+		const imageUrl = new URL(contentItem.publicUrl, 'https://temp.uri')
+		if (settings.canvasWidth > settings.canvasHeight)
+			imageUrl.searchParams.append('w', settings.canvasWidth.toString());
+		else
+			imageUrl.searchParams.append('h', settings.canvasHeight.toString());
+	  
+		element("backdrop").style.backgroundImage = `url(${imageUrl.pathname}${imageUrl.search})`;
 		element('backdrop-wrapper').setAttribute('data-loading', 'false');
 	}
 

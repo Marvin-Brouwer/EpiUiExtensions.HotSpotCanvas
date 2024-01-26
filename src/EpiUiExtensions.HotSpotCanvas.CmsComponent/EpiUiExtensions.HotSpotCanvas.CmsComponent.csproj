@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="node_modules\%40epi-ui-extensions\hot-spot-canvas-cms\dist\**" />
+        <EmbeddedResource Include="node_modules\%40epi-ui-hot-spot-canvas\cms\dist\**" />
     </ItemGroup>
 
     <ItemGroup>

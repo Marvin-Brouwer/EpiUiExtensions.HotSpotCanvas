@@ -7,15 +7,40 @@
       display: 'flex',
       position: 'relative',
       overflow: 'visible',
-      width: `${canvasWidth(props)}px`,
-      height: `${canvasHeight(props)}px`,
+      width: `${canvasMetaData.width}px`,
+      height: `${canvasMetaData.height}px`,
     }"
   >
-    <img
-      :src="createImageUrl(props)"
-      :width="canvasWidth(props)"
-      :height="canvasHeight(props)"
-    />
+    <div
+      :style="{
+        margin: '0',
+        padding: '0',
+        position: 'relative',
+        display: 'flex',
+        overflow: 'hidden',
+        alignContent: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: `${canvasMetaData.width}px`,
+        height: `${canvasMetaData.height}px`,
+      }"
+    >
+      <img
+        :src="canvasMetaData.url"
+        :width="canvasMetaData.imageWidth"
+        :height="canvasMetaData.imageHeight"
+        :alt="canvasAltText"
+        :style="{
+          margin: '0',
+          padding: '0',
+          position: 'absolute',
+          display: 'flex',
+          alignContent: 'center',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }"
+      />
+    </div>
 
     <ul
       :style="{
@@ -37,8 +62,8 @@
           overflow: 'visible',
           position: 'absolute',
           textDecoration: 'none',
-          left: `${hotSpot.coordinates.x}px`,
-          top: `${hotSpot.coordinates.y}px`,
+          left: `${hotSpot.coordinates.x}%`,
+          top: `${hotSpot.coordinates.y}%`,
         }"
         :key="index"
       >
@@ -59,65 +84,106 @@
 </template>
 
 <script lang="ts">
-export function getContentUrl(siteHost: string, hotSpot: HotSpotViewModel) {
-  return pathJoin([siteHost, hotSpot.contentUrl]);
-}
-export function pathJoin(parts: Array<string>, separator: string = "/") {
-  var replace = new RegExp(separator + "{1,}", "g");
-  return ("/" + parts.join(separator)).replace(replace, separator);
-}
-export function urlJoin(origin: string, parts: Array<string>) {
-  const path = pathJoin(parts);
-  const url = new URL(origin);
-  url.pathname = path;
-  return url;
-}
-
+export type Coordinate = {
+  x: number;
+  y: number;
+};
 export type HotSpotViewModel<T = any> = {
   contentUrl: string;
-  coordinates: {
-    x: number;
-    y: number;
-  };
+  coordinates: Coordinate;
   content: T;
 };
 export type HotSpotCanvasViewModel<T = any> = {
-  canvasWidth: number;
-  canvasHeight: number;
+  canvasDimensions: {
+    defaultWidth: number;
+    defaultHeight: number;
+    aspectRatio: number;
+  };
   imageUrl: string;
   hotSpots: Array<HotSpotViewModel<T>>;
 };
 export type HotSpotCanvasProps<T = any> = {
   siteHost: string;
+  canvasWidth?: number;
+  canvasHeight?: number;
+  canvasAltText?: string;
   model: HotSpotCanvasViewModel<T>;
 };
 
 export default {
   name: "hot-spot-canvas",
 
-  props: ["model", "siteHost"],
+  props: {
+    model: { default: undefined },
+    canvasAltText: {
+      default: "A canvas containing hot-spots referencing pages and products",
+    },
+    canvasWidth: { default: undefined },
+    canvasHeight: { default: undefined },
+    siteHost: { default: undefined },
+  },
 
-  methods: {
-    createImageUrl: function createImageUrl(props: HotSpotCanvasProps) {
+  data() {
+    return {
+      canvasMetaData: {
+        width: this.model.canvasDimensions.defaultWidth,
+        height: this.model.canvasDimensions.defaultHeight,
+        imageWidth: this.model.canvasDimensions.defaultWidth,
+        imageHeight: this.model.canvasDimensions.defaultHeight,
+        url: undefined,
+      },
+    };
+  },
+
+  mounted() {
+    const calculateWidth = () => {
+      if (this.canvasWidth) return this.canvasWidth;
+      if (this.canvasHeight)
+        return this.canvasHeight / this.model.canvasDimensions.aspectRatio;
+      return this.model.canvasDimensions.defaultWidth;
+    };
+    const calculateHeight = () => {
+      if (this.canvasHeight) return this.canvasHeight;
+      if (this.canvasWidth)
+        return this.canvasWidth * this.model.canvasDimensions.aspectRatio;
+      return this.model.canvasDimensions.defaultHeight;
+    };
+    const width = calculateWidth();
+    const height = calculateHeight();
+    if (height > width) {
+      this.canvasMetaData = {
+        ...this.canvasMetaData,
+        imageWidth: null,
+      };
+    } else {
+      this.canvasMetaData = {
+        ...this.canvasMetaData,
+        imageHeight: null,
+      };
+    }
+    const createImageUrl = () => {
       if (!this.model) return null;
       const imageUrl = new URL(this.model.imageUrl, this.siteHost);
-      imageUrl.searchParams.append(
-        "w",
-        this.canvasWidth(this.props).toString()
-      );
-      imageUrl.searchParams.append(
-        "h",
-        this.canvasHeight(this.props).toString()
-      );
-      imageUrl.searchParams.append("mode", "crop");
+      if (this.canvasMetaData.imageWidth) {
+        imageUrl.searchParams.append(
+          "w",
+          this.canvasMetaData.imageWidth.toString()
+        );
+      }
+      if (this.canvasMetaData.imageHeight) {
+        imageUrl.searchParams.append(
+          "h",
+          this.canvasMetaData.imageHeight.toString()
+        );
+      }
       return imageUrl.toString();
-    },
-    canvasWidth: function canvasWidth(props: HotSpotCanvasProps) {
-      return this.model?.canvasWidth ?? 0;
-    },
-    canvasHeight: function canvasHeight(props: HotSpotCanvasProps) {
-      return this.model?.canvasHeight ?? 0;
-    },
+    };
+    this.canvasMetaData = {
+      ...this.canvasMetaData,
+      width,
+      height,
+      url: createImageUrl(),
+    };
   },
 };
 </script>
