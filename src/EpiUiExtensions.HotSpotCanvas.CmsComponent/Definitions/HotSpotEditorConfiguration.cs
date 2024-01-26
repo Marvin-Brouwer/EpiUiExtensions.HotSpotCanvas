@@ -4,9 +4,9 @@ namespace EpiUiExtensions.HotSpotCanvas.CmsComponent.Definitions;
 
 public record struct HotSpotEditorConfiguration
 {
-    public float Offset { get; set; }
-    public float CanvasWidth { get; set; }
-    public float CanvasHeight { get; set; }
+    public decimal Offset { get; set; }
+    public decimal CanvasWidth { get; set; }
+    public decimal CanvasHeight { get; set; }
     public short MaxHotSpots { get; set; }
 
     public IEnumerable<string> SupportedPageTypes { get; set; }

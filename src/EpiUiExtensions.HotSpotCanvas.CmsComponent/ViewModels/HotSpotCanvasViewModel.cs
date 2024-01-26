@@ -4,8 +4,7 @@ namespace EpiUiExtensions.HotSpotCanvas.CmsComponent.ViewModels;
 
 public sealed class HotSpotCanvasViewModel
 {
-    public float CanvasWidth { get; set; }
-    public float CanvasHeight { get; set; }
+    public HotSpotCanvasDimensions CanvasDimensions { get; set; }
 
     /// <summary>
     /// Asset url for the <see cref="Models.HotSpotCanvasModel.Image"/>

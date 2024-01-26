@@ -1,55 +1,70 @@
+"use client";
 import * as React from "react";
+import { useState, useEffect } from "react";
 
+export type Coordinate = {
+  x: number;
+  y: number;
+};
 export type HotSpotViewModel<T = any> = {
   contentUrl: string;
-  coordinates: {
-    x: number;
-    y: number;
-  };
+  coordinates: Coordinate;
   content: T;
 };
 export type HotSpotCanvasViewModel<T = any> = {
-  canvasWidth: number;
-  canvasHeight: number;
+  canvasDimensions: {
+    defaultWidth: number;
+    defaultHeight: number;
+    aspectRatio: number;
+  };
   imageUrl: string;
   hotSpots: Array<HotSpotViewModel<T>>;
 };
 export type HotSpotCanvasProps<T = any> = {
   siteHost: string;
+  canvasWidth?: number;
+  canvasHeight?: number;
+  canvasAltText?: string;
+  canvasResizeMode: CanvasResizeMode;
   model: HotSpotCanvasViewModel<T>;
 };
 
-export function getContentUrl(siteHost: string, hotSpot: HotSpotViewModel) {
-  return pathJoin([siteHost, hotSpot.contentUrl]);
-}
-export function pathJoin(parts: Array<string>, separator: string = "/") {
-  var replace = new RegExp(separator + "{1,}", "g");
-  return ("/" + parts.join(separator)).replace(replace, separator);
-}
-export function urlJoin(origin: string, parts: Array<string>) {
-  const path = pathJoin(parts);
-  const url = new URL(origin);
-  url.pathname = path;
-  return url;
-}
-
 function HotSpotCanvas(props: HotSpotCanvasProps) {
-  function createImageUrl(props: HotSpotCanvasProps) {
-    if (!props?.model) return null;
-    const imageUrl = new URL(props.model.imageUrl, props.siteHost);
-    imageUrl.searchParams.append("w", canvasWidth(props).toString());
-    imageUrl.searchParams.append("h", canvasHeight(props).toString());
-    imageUrl.searchParams.append("mode", "crop");
-    return imageUrl.toString();
-  }
+  const [canvasMetaData, setCanvasMetaData] = useState(() => ({
+    width: props.model.canvasDimensions.defaultWidth,
+    height: props.model.canvasDimensions.defaultHeight,
+    url: undefined,
+  }));
 
-  function canvasWidth(props: HotSpotCanvasProps) {
-    return props?.model?.canvasWidth ?? 0;
-  }
-
-  function canvasHeight(props: HotSpotCanvasProps) {
-    return props?.model?.canvasHeight ?? 0;
-  }
+  useEffect(() => {
+    const calculateWidth = () => {
+      if (props.canvasWidth) return props.canvasWidth;
+      if (props.canvasHeight)
+        return props.canvasHeight / props.model.canvasDimensions.aspectRatio;
+      return props.model.canvasDimensions.defaultWidth;
+    };
+    const calculateHeight = () => {
+      if (props.canvasHeight) return props.canvasHeight;
+      if (props.canvasWidth)
+        return props.canvasWidth * props.model.canvasDimensions.aspectRatio;
+      return props.model.canvasDimensions.defaultHeight;
+    };
+    const width = calculateWidth();
+    const height = calculateHeight();
+    const createImageUrl = () => {
+      if (!props?.model) return null;
+      const imageUrl = new URL(props.model.imageUrl, props.siteHost);
+      imageUrl.searchParams.append("w", width.toString());
+      imageUrl.searchParams.append("h", height.toString());
+      imageUrl.searchParams.append("mode", "crop");
+      return imageUrl.toString();
+    };
+    setCanvasMetaData({
+      width,
+      height,
+      url: createImageUrl(),
+    });
+  }, []);
 
   return (
     <>
@@ -62,14 +77,15 @@ function HotSpotCanvas(props: HotSpotCanvasProps) {
               display: "flex",
               position: "relative",
               overflow: "visible",
-              width: `${canvasWidth(props)}px`,
-              height: `${canvasHeight(props)}px`,
+              width: `${canvasMetaData.width}px`,
+              height: `${canvasMetaData.height}px`,
             }}
           >
             <img
-              src={createImageUrl(props)}
-              width={canvasWidth(props)}
-              height={canvasHeight(props)}
+              src={canvasMetaData.url}
+              width={canvasMetaData.width}
+              height={canvasMetaData.height}
+              alt={props.canvasAltText}
             />
 
             <ul
@@ -92,8 +108,8 @@ function HotSpotCanvas(props: HotSpotCanvasProps) {
                     overflow: "visible",
                     position: "absolute",
                     textDecoration: "none",
-                    left: `${hotSpot.coordinates.x}px`,
-                    top: `${hotSpot.coordinates.y}px`,
+                    left: `${hotSpot.coordinates.x}%`,
+                    top: `${hotSpot.coordinates.y}%`,
                   }}
                 >
                   {hotSpot.content.contentType.includes("Page") ? (
@@ -122,5 +138,9 @@ function HotSpotCanvas(props: HotSpotCanvasProps) {
     </>
   );
 }
+
+HotSpotCanvas.defaultProps = {
+  canvasAltText: "A canvas containing hot-spots referencing pages and products",
+};
 
 export default HotSpotCanvas;

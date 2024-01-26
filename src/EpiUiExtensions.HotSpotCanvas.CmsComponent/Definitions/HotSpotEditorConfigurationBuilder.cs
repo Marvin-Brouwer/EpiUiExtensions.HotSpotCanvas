@@ -13,7 +13,7 @@ internal sealed class HotSpotEditorConfigurationBuilder : IHotSpotEditorConfigur
 
     private HotSpotEditorConfiguration _configuration;
 
-    private const float DefaultOffset = 10;
+    private const decimal DefaultOffset = 10;
 
     public HotSpotEditorConfigurationBuilder()
     {
@@ -25,7 +25,7 @@ internal sealed class HotSpotEditorConfigurationBuilder : IHotSpotEditorConfigur
         UseCatalogTypes(typeof(ProductContent), typeof(VariationContent));
     }
 
-    public IHotSpotEditorConfigurationBuilder UseDimensions(float width, float height, float? offset = null)
+    public IHotSpotEditorConfigurationBuilder UseDimensions(decimal width, decimal height, decimal? offset = null)
     {
         Guard.Against.NegativeOrZero(width, nameof(width));
         Guard.Against.NegativeOrZero(height, nameof(height));

@@ -1,16 +1,20 @@
-import { For, Show, Slot } from '@builder.io/mitosis';
+import { For, Show, Slot, useState, onMount, useDefaultProps } from '@builder.io/mitosis';
 
+export type Coordinate = { x: number, y: number };
 export type HotSpotViewModel<T = any> = {
 
 	contentUrl: string,
-	coordinates: { x: number, y: number },
+	coordinates: Coordinate,
 	content: T
 }
 
 export type HotSpotCanvasViewModel<T = any> = {
 
-	canvasWidth: number,
-	canvasHeight: number,
+	canvasDimensions: {
+    defaultWidth: number,
+    defaultHeight: number,
+    aspectRatio: number,
+  }
 
 	imageUrl: string,
 	hotSpots: Array<HotSpotViewModel<T>>
@@ -18,32 +22,68 @@ export type HotSpotCanvasViewModel<T = any> = {
 
 export type HotSpotCanvasProps<T = any> = {
   siteHost: string,
+  canvasWidth?: number, 
+  canvasHeight?: number, 
+  canvasAltText?: string,
+  canvasResizeMode: CanvasResizeMode,
   model: HotSpotCanvasViewModel<T>,
 };
 
+
 export default function HotSpotCanvas(props: HotSpotCanvasProps) {
 
-  function createImageUrl(props: HotSpotCanvasProps) {
+  useDefaultProps({
+    canvasAltText: "A canvas containing hot-spots referencing pages and products"
+  });
 
-    if (!props?.model) return null;
-    
-    const imageUrl = new URL(props.model.imageUrl, props.siteHost)
-    imageUrl.searchParams.append('w', canvasWidth(props).toString());
-    imageUrl.searchParams.append('h', canvasHeight(props).toString());
-    imageUrl.searchParams.append('mode', 'crop');
+  const [canvasMetaData, setCanvasMetaData] = useState({
+    width: props.model.canvasDimensions.defaultWidth,
+    height: props.model.canvasDimensions.defaultHeight,
+    url: undefined,
+  })
+
+  onMount(() => {
+
+    const calculateWidth = () => {
+      
+      if (props.canvasWidth) return props.canvasWidth;
   
-    return imageUrl.toString();
-  }
+      if (props.canvasHeight)
+        return props.canvasHeight / props.model.canvasDimensions.aspectRatio
+      
+      return props.model.canvasDimensions.defaultWidth
+    }
+    
+    const calculateHeight = () => {
+  
+      if (props.canvasHeight) return props.canvasHeight;
+  
+      if (props.canvasWidth)
+        return props.canvasWidth * props.model.canvasDimensions.aspectRatio
+  
+      return props.model.canvasDimensions.defaultHeight
+    }
+    const width = calculateWidth()
+    const height = calculateHeight()
+  
+    const createImageUrl = () => {
+  
+      if (!props?.model) return null;
+      
+      const imageUrl = new URL(props.model.imageUrl, props.siteHost)
+      imageUrl.searchParams.append('w', width.toString());
+      imageUrl.searchParams.append('h', height.toString());
+      imageUrl.searchParams.append('mode', 'crop');
+    
+      return imageUrl.toString();
+    }
 
-  function canvasWidth(props: HotSpotCanvasProps) {
-
-    return props?.model?.canvasWidth ?? 0;
-  }
-
-  function canvasHeight(props: HotSpotCanvasProps) {
-
-    return props?.model?.canvasHeight ?? 0;
-  }
+    setCanvasMetaData({
+      width,
+      height,
+      url: createImageUrl()
+    })
+  })
 
   return (
     <Show when={!!props?.model}>
@@ -54,11 +94,16 @@ export default function HotSpotCanvas(props: HotSpotCanvasProps) {
           display: "flex",
           position: "relative",
           overflow: "visible",
-          width: `${canvasWidth(props)}px`, 
-          height: `${canvasHeight(props)}px` 
+          width: `${canvasMetaData.width}px`,
+          height: `${canvasMetaData.height}px`,
         }}
       >
-      <img src={createImageUrl(props)} width={canvasWidth(props)} height={canvasHeight(props)} />
+      <img 
+        src={canvasMetaData.url} 
+        width={canvasMetaData.width} 
+        height={canvasMetaData.height} 
+        alt={props.canvasAltText} 
+      />
 
       <ul
         style={{
@@ -82,8 +127,8 @@ export default function HotSpotCanvas(props: HotSpotCanvasProps) {
               overflow: 'visible',
               position: 'absolute',
               textDecoration: 'none',
-              left: `${hotSpot.coordinates.x}px`, 
-              top: `${hotSpot.coordinates.y}px`
+              left: `${hotSpot.coordinates.x}%`, 
+              top: `${hotSpot.coordinates.y}%`
             }}
           >
               <Show when={hotSpot.content.contentType.includes('Page')}>
@@ -110,22 +155,3 @@ export default function HotSpotCanvas(props: HotSpotCanvasProps) {
   </Show>
   );
 }
-
-export function getContentUrl (siteHost: string, hotSpot: HotSpotViewModel) {
-	return pathJoin([siteHost, hotSpot.contentUrl]);
-};
-
-export function pathJoin(parts: Array<string>, separator: string = '/') {
-
-	var replace = new RegExp(separator+'{1,}', 'g');
-	return ('/' + parts.join(separator)).replace(replace, separator);
-};
-
-export function urlJoin(origin: string, parts: Array<string>) {
-
-	const path = pathJoin(parts);
-	const url = new URL(origin);
-	url.pathname = path;
-
-	return url;
-};
