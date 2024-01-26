@@ -11,12 +11,31 @@
         height: `${canvasMetaData.height}px`,
       }"
     >
-      <img
-        :src="canvasMetaData.url"
-        :width="canvasMetaData.width"
-        :height="canvasMetaData.height"
-        :alt="canvasAltText"
-      />
+      <div
+        :style="{
+          margin: '0',
+          padding: '0',
+          position: 'relative',
+          display: 'flex',
+          overflow: 'hidden',
+        }"
+      >
+        <img
+          :src="canvasMetaData.url"
+          :width="canvasMetaData.imageWidth"
+          :height="canvasMetaData.imageHeight"
+          :alt="canvasAltText"
+          :style="{
+            margin: '0',
+            padding: '0',
+            position: 'absolute',
+            display: 'flex',
+            alignContent: 'center',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }"
+        />
+      </div>
 
       <ul
         :style="{
@@ -86,7 +105,6 @@ export type HotSpotCanvasProps<T = any> = {
   canvasWidth?: number;
   canvasHeight?: number;
   canvasAltText?: string;
-  canvasResizeMode: CanvasResizeMode;
   model: HotSpotCanvasViewModel<T>;
 };
 
@@ -108,6 +126,8 @@ export default defineComponent({
       canvasMetaData: {
         width: this.model.canvasDimensions.defaultWidth,
         height: this.model.canvasDimensions.defaultHeight,
+        imageWidth: this.model.canvasDimensions.defaultWidth,
+        imageHeight: this.model.canvasDimensions.defaultHeight,
         url: undefined,
       },
     };
@@ -128,15 +148,36 @@ export default defineComponent({
     };
     const width = calculateWidth();
     const height = calculateHeight();
+    if (height > width) {
+      this.canvasMetaData = {
+        ...this.canvasMetaData,
+        imageWidth: null,
+      };
+    } else {
+      this.canvasMetaData = {
+        ...this.canvasMetaData,
+        imageHeight: null,
+      };
+    }
     const createImageUrl = () => {
       if (!this.model) return null;
       const imageUrl = new URL(this.model.imageUrl, this.siteHost);
-      imageUrl.searchParams.append("w", width.toString());
-      imageUrl.searchParams.append("h", height.toString());
-      imageUrl.searchParams.append("mode", "crop");
+      if (this.canvasMetaData.imageWidth) {
+        imageUrl.searchParams.append(
+          "w",
+          this.canvasMetaData.imageWidth.toString()
+        );
+      }
+      if (this.canvasMetaData.imageHeight) {
+        imageUrl.searchParams.append(
+          "h",
+          this.canvasMetaData.imageHeight.toString()
+        );
+      }
       return imageUrl.toString();
     };
     this.canvasMetaData = {
+      ...this.canvasMetaData,
       width,
       height,
       url: createImageUrl(),

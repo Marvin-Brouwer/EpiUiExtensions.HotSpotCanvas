@@ -23,7 +23,6 @@ export type HotSpotCanvasProps<T = any> = {
   canvasWidth?: number;
   canvasHeight?: number;
   canvasAltText?: string;
-  canvasResizeMode: CanvasResizeMode;
   model: HotSpotCanvasViewModel<T>;
 };
 
@@ -31,6 +30,8 @@ function HotSpotCanvas(props: HotSpotCanvasProps) {
   const [canvasMetaData, setCanvasMetaData] = createSignal({
     width: props.model.canvasDimensions.defaultWidth,
     height: props.model.canvasDimensions.defaultHeight,
+    imageWidth: props.model.canvasDimensions.defaultWidth,
+    imageHeight: props.model.canvasDimensions.defaultHeight,
     url: undefined,
   });
 
@@ -49,15 +50,36 @@ function HotSpotCanvas(props: HotSpotCanvasProps) {
     };
     const width = calculateWidth();
     const height = calculateHeight();
+    if (height > width) {
+      setCanvasMetaData({
+        ...canvasMetaData(),
+        imageWidth: null,
+      });
+    } else {
+      setCanvasMetaData({
+        ...canvasMetaData(),
+        imageHeight: null,
+      });
+    }
     const createImageUrl = () => {
       if (!props?.model) return null;
       const imageUrl = new URL(props.model.imageUrl, props.siteHost);
-      imageUrl.searchParams.append("w", width.toString());
-      imageUrl.searchParams.append("h", height.toString());
-      imageUrl.searchParams.append("mode", "crop");
+      if (canvasMetaData().imageWidth) {
+        imageUrl.searchParams.append(
+          "w",
+          canvasMetaData().imageWidth.toString()
+        );
+      }
+      if (canvasMetaData().imageHeight) {
+        imageUrl.searchParams.append(
+          "h",
+          canvasMetaData().imageHeight.toString()
+        );
+      }
       return imageUrl.toString();
     };
     setCanvasMetaData({
+      ...canvasMetaData(),
       width,
       height,
       url: createImageUrl(),
@@ -77,12 +99,31 @@ function HotSpotCanvas(props: HotSpotCanvasProps) {
           height: `${canvasMetaData().height}px`,
         }}
       >
-        <img
-          src={canvasMetaData().url}
-          width={canvasMetaData().width}
-          height={canvasMetaData().height}
-          alt={props.canvasAltText}
-        />
+        <div
+          style={{
+            margin: "0",
+            padding: "0",
+            position: "relative",
+            display: "flex",
+            overflow: "hidden",
+          }}
+        >
+          <img
+            src={canvasMetaData().url}
+            width={canvasMetaData().imageWidth}
+            height={canvasMetaData().imageHeight}
+            alt={props.canvasAltText}
+            style={{
+              margin: "0",
+              padding: "0",
+              position: "absolute",
+              display: "flex",
+              "align-content": "center",
+              "justify-content": "center",
+              "align-items": "center",
+            }}
+          />
+        </div>
         <ul
           style={{
             display: "inline-flex",

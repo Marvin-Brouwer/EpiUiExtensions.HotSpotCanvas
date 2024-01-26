@@ -25,7 +25,6 @@
     canvasWidth?: number;
     canvasHeight?: number;
     canvasAltText?: string;
-    canvasResizeMode: CanvasResizeMode;
     model: HotSpotCanvasViewModel<T>;
   };
 </script>
@@ -53,6 +52,8 @@
   let canvasMetaData = {
     width: model.canvasDimensions.defaultWidth,
     height: model.canvasDimensions.defaultHeight,
+    imageWidth: model.canvasDimensions.defaultWidth,
+    imageHeight: model.canvasDimensions.defaultHeight,
     url: undefined,
   };
 
@@ -70,15 +71,33 @@
     };
     const width = calculateWidth();
     const height = calculateHeight();
+    if (height > width) {
+      canvasMetaData = {
+        ...canvasMetaData,
+        imageWidth: null,
+      };
+    } else {
+      canvasMetaData = {
+        ...canvasMetaData,
+        imageHeight: null,
+      };
+    }
     const createImageUrl = () => {
       if (!model) return null;
       const imageUrl = new URL(model.imageUrl, siteHost);
-      imageUrl.searchParams.append("w", width.toString());
-      imageUrl.searchParams.append("h", height.toString());
-      imageUrl.searchParams.append("mode", "crop");
+      if (canvasMetaData.imageWidth) {
+        imageUrl.searchParams.append("w", canvasMetaData.imageWidth.toString());
+      }
+      if (canvasMetaData.imageHeight) {
+        imageUrl.searchParams.append(
+          "h",
+          canvasMetaData.imageHeight.toString()
+        );
+      }
       return imageUrl.toString();
     };
     canvasMetaData = {
+      ...canvasMetaData,
       width,
       height,
       url: createImageUrl(),
@@ -98,12 +117,31 @@
     }}
     class="hot-spot-canvas"
   >
-    <img
-      src={canvasMetaData.url}
-      width={canvasMetaData.width}
-      height={canvasMetaData.height}
-      alt={canvasAltText}
-    />
+    <div
+      use:mitosis_styling={{
+        margin: "0",
+        padding: "0",
+        position: "relative",
+        display: "flex",
+        overflow: "hidden",
+      }}
+    >
+      <img
+        use:mitosis_styling={{
+          margin: "0",
+          padding: "0",
+          position: "absolute",
+          display: "flex",
+          alignContent: "center",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        src={canvasMetaData.url}
+        width={canvasMetaData.imageWidth}
+        height={canvasMetaData.imageHeight}
+        alt={canvasAltText}
+      />
+    </div>
 
     <ul
       use:mitosis_styling={{

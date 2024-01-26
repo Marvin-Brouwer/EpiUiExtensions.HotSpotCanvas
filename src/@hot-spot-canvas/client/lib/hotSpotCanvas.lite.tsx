@@ -25,11 +25,14 @@ export type HotSpotCanvasProps<T = any> = {
   canvasWidth?: number, 
   canvasHeight?: number, 
   canvasAltText?: string,
-  canvasResizeMode: CanvasResizeMode,
   model: HotSpotCanvasViewModel<T>,
 };
 
-
+/*
+ * Why does this use an image tag that is overflowing?
+ * The image-resizer, provided by EpiServer, doesn't have a 'mode=cover'
+ * The reason we don't use background-image, is that we want to keep it as accessible as possible.
+ */
 export default function HotSpotCanvas(props: HotSpotCanvasProps) {
 
   useDefaultProps({
@@ -39,6 +42,8 @@ export default function HotSpotCanvas(props: HotSpotCanvasProps) {
   const [canvasMetaData, setCanvasMetaData] = useState({
     width: props.model.canvasDimensions.defaultWidth,
     height: props.model.canvasDimensions.defaultHeight,
+    imageWidth: props.model.canvasDimensions.defaultWidth,
+    imageHeight: props.model.canvasDimensions.defaultHeight,
     url: undefined,
   })
 
@@ -65,20 +70,38 @@ export default function HotSpotCanvas(props: HotSpotCanvasProps) {
     }
     const width = calculateWidth()
     const height = calculateHeight()
+
+    if (height > width) {
+      setCanvasMetaData({
+        ...canvasMetaData,
+        imageWidth: null
+      })
+    }
+    else {
+      setCanvasMetaData({
+        ...canvasMetaData,
+        imageHeight: null
+      })
+    }
   
     const createImageUrl = () => {
   
       if (!props?.model) return null;
       
-      const imageUrl = new URL(props.model.imageUrl, props.siteHost)
-      imageUrl.searchParams.append('w', width.toString());
-      imageUrl.searchParams.append('h', height.toString());
-      imageUrl.searchParams.append('mode', 'crop');
+      const imageUrl = new URL(props.model.imageUrl, props.siteHost);
+      
+      if (canvasMetaData.imageWidth) {
+        imageUrl.searchParams.append('w', canvasMetaData.imageWidth.toString());
+      }
+      if (canvasMetaData.imageHeight){
+        imageUrl.searchParams.append('h', canvasMetaData.imageHeight.toString());
+      }
     
       return imageUrl.toString();
     }
 
     setCanvasMetaData({
+      ...canvasMetaData,
       width,
       height,
       url: createImageUrl()
@@ -98,12 +121,36 @@ export default function HotSpotCanvas(props: HotSpotCanvasProps) {
           height: `${canvasMetaData.height}px`,
         }}
       >
-      <img 
-        src={canvasMetaData.url} 
-        width={canvasMetaData.width} 
-        height={canvasMetaData.height} 
-        alt={props.canvasAltText} 
-      />
+      <div 
+        style={{
+          margin: '0',
+          padding: '0',
+          position: 'relative',
+          display: "flex",
+          overflow: 'hidden',
+          alignContent: 'center',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: `${canvasMetaData.width}px`,
+          height: `${canvasMetaData.height}px`,
+        }}
+      >
+        <img 
+          src={canvasMetaData.url} 
+          width={canvasMetaData.imageWidth} 
+          height={canvasMetaData.imageHeight} 
+          alt={props.canvasAltText} 
+          style={{
+            margin: '0',
+            padding: '0',
+            position: 'absolute',
+            display: 'flex',
+            alignContent: 'center',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        />
+      </div>
 
       <ul
         style={{
