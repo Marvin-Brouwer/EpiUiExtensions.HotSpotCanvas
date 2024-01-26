@@ -58,7 +58,7 @@ export default defineComponent({
       :model="heroContent"
     >
       <template #page="{ hotSpot }">
-        <div class="hot-spot-wrapper">
+        <div class="hot-spot-wrapper" tab-index="0">
           <template v-slot:content>
             <PageCard
               :content="hotSpot.content"
@@ -68,14 +68,14 @@ export default defineComponent({
         </div>
       </template>
       <template v-slot:product="{ hotSpot }">
-        <div class="hot-spot-wrapper">
+        <div class="hot-spot-wrapper" tab-index="0">
           <template v-slot:content>
             <ProductCard :product="hotSpot" />
           </template>
         </div>
       </template>
       <template v-slot:variant="{ hotSpot }">
-        <div class="hot-spot-wrapper">
+        <div class="hot-spot-wrapper" tab-index="0">
           <template v-slot:content>
             <VariantCard :variant="hotSpot" />
           </template>

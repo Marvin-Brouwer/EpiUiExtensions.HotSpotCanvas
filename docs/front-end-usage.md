@@ -6,3 +6,4 @@
 > - [ ] package install
 > - [ ] available imports
 > - [ ] slot usage
+> - [ ] tab-index
